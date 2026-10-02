@@ -2,44 +2,137 @@
    "answer" is the position of the correct option, starting at 0. */
 const QUESTIONS = [
   {
-    q: "How many landmark points per eye does the Eye Aspect Ratio (EAR) use?",
+    q: "Why do drowsy-driving crash statistics likely understate the problem? (Section 1)",
+    options: [
+      "Drowsy crashes only happen at night",
+      "There is no roadside test for sleepiness, so it is hard to prove in crash reports",
+      "Most drowsy drivers are never involved in crashes",
+      "Police are not allowed to record drowsiness"
+    ],
+    answer: 1,
+    why: "Unlike alcohol, sleepiness can't be measured at the roadside. One study estimated drowsy drivers are involved in about ten times more fatal crashes than are officially reported."
+  },
+  {
+    q: "Why do most real-time systems use near-infrared (NIR) cameras with their own infrared lighting? (Sections 2 and 10)",
+    options: [
+      "They record in color",
+      "They need no landmark model",
+      "They see the face evenly in darkness and often through sunglasses",
+      "They run at a higher resolution than any RGB camera"
+    ],
+    answer: 2,
+    why: "Infrared lighting is invisible to the driver but gives the camera an evenly lit face at any time of day, and infrared often passes through lenses that block visible light."
+  },
+  {
+    q: "How many landmark points per eye does the Eye Aspect Ratio (EAR) use? (Section 3)",
     options: ["4", "6", "12", "68"],
     answer: 1,
     why: "EAR uses six points: the two eye corners (p1, p4), two on the upper lid (p2, p3), and two on the lower lid (p5, p6)."
   },
   {
-    q: "What happens to EAR when the eye closes?",
-    options: ["It rises sharply", "It stays the same", "It falls toward zero", "It becomes negative"],
-    answer: 2,
-    why: "EAR is the eye's height divided by its width. As the lids close, the height shrinks, so the ratio falls toward zero."
+    q: "A driver leans closer to the camera without changing how open their eyes are. What happens to EAR? (Section 3)",
+    options: [
+      "It rises, because the eye looks bigger",
+      "It falls, because the eye looks wider",
+      "It becomes negative",
+      "It stays about the same, because it is a ratio"
+    ],
+    answer: 3,
+    why: "Moving closer scales every distance by the same factor. The height and width both grow, so their ratio stays the same."
   },
   {
-    q: "How does a system tell a normal blink apart from drowsy eye closure?",
+    q: "How does a system tell a normal blink apart from drowsy eye closure? (Section 3)",
     options: [
-      "By the color of the eye",
       "By how long EAR stays below the threshold",
+      "By the color of the eye",
       "By which eye closes first",
       "By the size of the pupil"
     ],
-    answer: 1,
-    why: "A blink drops EAR for only a few frames. Drowsiness keeps it low much longer, so systems count consecutive frames below the threshold."
+    answer: 0,
+    why: "A blink drops EAR for only a fraction of a second. Drowsiness keeps it low much longer, so systems measure how long the eyes stay closed."
   },
   {
-    q: "What does PERCLOS measure?",
+    q: "What does PERCLOS measure? (Section 3)",
     options: [
-      "The percentage of time the eyes are mostly closed over a time window",
       "The number of yawns per minute",
+      "The percentage of time the eyes are mostly closed over a time window",
       "The angle of the driver's head",
       "The brightness of the eye region"
     ],
-    answer: 0,
-    why: "PERCLOS is the PERcentage of eyelid CLOSure: the share of frames in a window where the eyes are at least 80% closed."
+    answer: 1,
+    why: "PERCLOS is the PERcentage of eyelid CLOSure: the share of frames in a window, typically a minute, where the eyes are at least 80% closed."
   },
   {
-    q: "A driver wears dark sunglasses. Which signal is still most useful?",
-    options: ["Eye Aspect Ratio", "PERCLOS", "Head pose and yawning", "Pupil size"],
+    q: "The mouth opens wide for one second while the driver laughs. Why isn't it counted as a yawn? (Section 4)",
+    options: [
+      "MAR only works for yawns",
+      "Laughing lowers MAR",
+      "A yawn must keep MAR above the threshold for longer, such as 1.5 seconds",
+      "Yawns are only detected with the eyes closed"
+    ],
     answer: 2,
-    why: "Sunglasses hide the eyes, so eye-based measures fail. Mouth and head-pose signals still work."
+    why: "Height alone isn't enough. Yawns hold a wide opening for seconds, while laughing and talking only peak briefly, so a minimum duration filters them out."
+  },
+  {
+    q: "Which head-pitch pattern most suggests a driver is nodding off? (Section 5)",
+    options: [
+      "A slow sag downward followed by a sudden jerk back up",
+      "A smooth glance down at the dashboard and back",
+      "A quick turn to check the side mirror",
+      "Holding the head perfectly still"
+    ],
+    answer: 0,
+    why: "As neck muscles relax the head sags slowly, then the driver startles awake and jerks it back up, unlike a controlled glance, which goes down and returns smoothly."
+  },
+  {
+    q: "Why must features be scaled before using k-Nearest Neighbors? (Section 6)",
+    options: [
+      "k-NN only accepts values between 0 and 1",
+      "Scaling makes training faster",
+      "Scaling removes noisy windows",
+      "Otherwise the feature with the largest numbers dominates the distance"
+    ],
+    answer: 3,
+    why: "Blink duration in milliseconds would swamp PERCLOS in percent. Scaling puts every feature on a similar range so each one counts fairly."
+  },
+  {
+    q: "What advantage does a CNN + LSTM have over a CNN that looks at single frames? (Section 7)",
+    options: [
+      "It needs no training data",
+      "It can tell a blink from a long closure, because it sees the sequence over time",
+      "It runs without a GPU in every case",
+      "It explains its decisions in plain language"
+    ],
+    answer: 1,
+    why: "A single frame of a closed eye looks the same during a blink and a microsleep. The LSTM reads a sequence of frames, so it learns how long the closure lasts."
+  },
+  {
+    q: "Why can splitting video frames randomly into training and test sets make results look too good? (Section 8)",
+    options: [
+      "Random splits always create too small a test set",
+      "Random splits remove all drowsy frames",
+      "Near-identical frames of the same person end up in both sets",
+      "Random splits change the frame rate"
+    ],
+    answer: 2,
+    why: "Neighboring frames are almost copies. The model is then tested on people and moments it already saw, so a subject-independent split by driver is needed."
+  },
+  {
+    q: "On data where 90% of windows are alert, a system that always answers \"alert\" scores 90% accuracy. What is its recall for drowsiness? (Section 8)",
+    options: ["0%", "10%", "50%", "90%"],
+    answer: 0,
+    why: "It never catches a single drowsy window, so recall is zero. That's why precision and recall matter more than accuracy here."
+  },
+  {
+    q: "A driver with naturally narrow eyes keeps triggering false drowsiness alerts. What is the best fix? (Section 10)",
+    options: [
+      "Raise the fixed EAR threshold for everyone",
+      "Turn off eye detection for that driver",
+      "Use only yawning",
+      "Set the threshold relative to that driver's own open-eye baseline"
+    ],
+    answer: 3,
+    why: "A fixed threshold assumes an average face. Calibrating to each driver's own baseline adapts to naturally narrow or wide eyes."
   }
 ];
 
