@@ -16,23 +16,109 @@
     <article class="content">
       <p class="page-num">Section 8 of 12</p>
       <h1>Datasets and Evaluation</h1>
-      <p class="lead">Drowsiness is hard to record safely, so the choice of dataset shapes what a system really learns.</p>
+      <p class="lead">Drowsiness is hard to record safely and hard to label honestly, so the choice of dataset and the way a system is tested decide what its accuracy numbers really mean.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/08-datasets.mp3">Your browser does not support audio playback.</audio>
       </div>
+
       <h2>Driver drowsiness datasets</h2>
-      <p class="todo">Give an overview of the main public datasets and why real drowsiness is hard to capture (acted vs. real fatigue) <a class="cite" href="bibliography.html#ref2">[2]</a>.</p>
-      <figure>
-        <div class="fig-placeholder">Figure 10 goes here: Sample frames from a drowsiness dataset in different conditions<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 10. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
-      </figure>
-      <h2>NTHU-DDD and UTA-RLDD</h2>
-      <p class="todo">Describe the NTHU Driver Drowsiness Detection dataset (acted drowsiness; scenarios with glasses, sunglasses, and night) and the UTA Real-Life Drowsiness Dataset (about 30 hours of video from 60 participants in alert, low-vigilance, and drowsy states), which <a class="cite" href="bibliography.html#ref6">[6]</a> uses.</p>
+      <h3>Why drowsiness data is hard to collect</h3>
+      <p>For most vision tasks, collecting data is a matter of pointing a camera at the world. Drowsiness is different. Researchers can't ethically ask sleep-deprived people to drive on real roads, so every dataset makes a compromise:</p>
+      <ul>
+        <li><strong>Acted drowsiness:</strong> alert volunteers <em>pretend</em> to be drowsy in a driving simulator. Safe and easy to label, but acted yawns and nods may not look like real ones.</li>
+        <li><strong>Real drowsiness, outside a car:</strong> people record themselves when they genuinely feel alert or sleepy, for example at their desk late at night. The signs are real, but the setting isn't a car.</li>
+        <li><strong>Simulator studies with real fatigue:</strong> participants drive a simulator after sleep deprivation or long monotonous sessions. Realistic, but expensive and usually small.</li>
+      </ul>
+      <p>Labeling adds a second problem: there's no objective "drowsiness meter." Labels come from the driver's own rating, from observers watching the video, or from physiological sensors, and each can disagree with the others. How hard is it? When the creators of one real-life dataset asked human observers to judge alertness from the videos, their average accuracy was under 60% <a class="cite" href="bibliography.html#ref10">[10]</a>.</p>
+
+      <h3>NTHU Driver Drowsiness Detection dataset (NTHU-DDD)</h3>
+      <p>The most widely used benchmark was collected by the Computer Vision Lab at National Tsing Hua University for a 2016 challenge <a class="cite" href="bibliography.html#ref11">[11]</a>. Its key properties:</p>
+      <ul>
+        <li><strong>36 subjects</strong> of different ethnicities in simulated driving, performing normal driving, yawning, slow blinking, falling asleep, and bursting out laughing <a class="cite" href="bibliography.html#ref11">[11]</a>.</li>
+        <li><strong>Five scenarios</strong> covering eyewear and lighting: bare face, glasses, and sunglasses during the day, and bare face and glasses at night <a class="cite" href="bibliography.html#ref11">[11]</a>. Night videos were recorded at 15 frames per second and daytime videos at 30 <a class="cite" href="bibliography.html#ref11">[11]</a>, and the recordings use infrared video <a class="cite" href="bibliography.html#ref10">[10]</a>.</li>
+        <li><strong>A built-in subject split:</strong> 18 subjects for training, with evaluation and test videos coming from the other 18 <a class="cite" href="bibliography.html#ref11">[11]</a>.</li>
+      </ul>
+      <p>Its strength is control: every subject appears in every scenario, so researchers can measure exactly how much sunglasses or darkness hurt their system. Its weakness is that the drowsiness is acted.</p>
+
+      <h3>UTA Real-Life Drowsiness Dataset (UTA-RLDD)</h3>
+      <p>The University of Texas at Arlington built this dataset to capture real, often subtle drowsiness <a class="cite" href="bibliography.html#ref10">[10]</a>:</p>
+      <ul>
+        <li><strong>About 30 hours of video from 60 participants</strong>, with one video each in an alert, low-vigilance, and drowsy state, for 180 videos in total <a class="cite" href="bibliography.html#ref10">[10]</a>.</li>
+        <li><strong>Self-recorded</strong> by participants on their own phones or webcams, from varied angles and backgrounds, at under 30 frames per second, similar to what an everyday camera would capture <a class="cite" href="bibliography.html#ref10">[10]</a>.</li>
+        <li><strong>Realistic variety:</strong> participants wore glasses in 21 of the 180 videos and had considerable facial hair in 72 <a class="cite" href="bibliography.html#ref10">[10]</a>.</li>
+      </ul>
+      <p>This is the dataset Herath et al. used for their YOLO comparison in Section 7, selecting 18 of the 60 participants and extracting 3,418 frames <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
+
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>NTHU-DDD</th><th>UTA-RLDD</th></tr></thead>
+        <tbody>
+          <tr><td>Subjects</td><td>36</td><td>60</td></tr>
+          <tr><td>Drowsiness</td><td>Acted in a simulator</td><td>Real, self-reported states</td></tr>
+          <tr><td>Labels</td><td>Drowsy / not drowsy, plus eye, mouth, and head states</td><td>Alert / low vigilance / drowsy</td></tr>
+          <tr><td>Camera</td><td>Fixed setup, infrared video, day and night</td><td>Participants' own phones and webcams</td></tr>
+          <tr><td>Best for</td><td>Testing robustness to glasses, sunglasses, and night</td><td>Testing on realistic, subtle drowsiness</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Other public datasets cover pieces of the problem, such as videos of drivers yawning and talking, or large collections of open and closed eye images for training eye-state CNNs. Most research systems combine a benchmark dataset with their own recordings.</p>
+
       <h2>Training and testing</h2>
-      <p class="todo">Explain subject-independent splits, and why splitting frames from the same person across training and test sets inflates results.</p>
+      <p>The most common mistake in drowsiness research is not a bad model but a bad <strong>split</strong>. A video at 30 frames per second produces 30 almost identical images every second. If those frames are shuffled and split randomly, the test set ends up full of near-copies of training images: the same person, the same lighting, a thirtieth of a second apart. The model can score highly by recognizing the person and moment instead of learning what drowsiness looks like.</p>
+      <p>The fix is a <strong>subject-independent</strong> split: every frame of a given person goes entirely into training or entirely into testing, so the test measures performance on new drivers. NTHU-DDD's official split already works this way <a class="cite" href="bibliography.html#ref11">[11]</a>. The random frame split in the YOLO study <a class="cite" href="bibliography.html#ref6">[6]</a> is a reason to expect lower numbers if those models met new drivers.</p>
+
+      <figure>
+        <div class="split-lab">
+          <h3>Try it: two ways to split the same videos</h3>
+          <p>Each row is one driver's video and each tile is a frame. Tiles marked <strong>T</strong> go to the test set; faded tiles go to training.</p>
+          <div class="row" id="split-mode" role="group" aria-label="Split method">
+            <button type="button" data-mode="random">Random frame split</button>
+            <button type="button" data-mode="driver">Split by driver</button>
+          </div>
+          <div class="drivers" id="split-drivers"></div>
+          <div class="msg" id="split-msg" aria-live="polite"></div>
+        </div>
+        <figcaption>Figure 10. Interactive comparison of a random frame split and a subject-independent split, using illustrative data. Created by the author.</figcaption>
+      </figure>
+
+      <p>Two related leaks are worth checking too. Overlapping time windows (Section 6) taken from the same stretch of video should never land on both sides of the split. And any threshold or setting tuned while looking at the test set makes the test result optimistic; tune on a separate validation set instead.</p>
+
       <h2>Measuring detection performance</h2>
-      <p class="todo">Define accuracy, precision, recall, F1, and mAP <a class="cite" href="bibliography.html#ref6">[6]</a>. Explain why missed drowsiness (low recall) and false alarms (low precision) matter differently in a car.</p>
+      <p>Every prediction falls into one of four outcomes, usually shown as a <strong>confusion matrix</strong>. Here is an illustrative example: 1,000 one-minute windows, of which 100 are truly drowsy.</p>
+      <div class="table-wrap">
+      <table class="cm">
+        <thead><tr><th></th><th>Predicted drowsy</th><th>Predicted alert</th></tr></thead>
+        <tbody>
+          <tr><th>Actually drowsy (100)</th><td class="hit"><strong>80</strong><br>true positives (TP)</td><td class="miss"><strong>20</strong><br>false negatives (FN)</td></tr>
+          <tr><th>Actually alert (900)</th><td class="miss"><strong>50</strong><br>false positives (FP)</td><td class="hit"><strong>850</strong><br>true negatives (TN)</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Formula</th><th>Question it answers</th><th>In the example</th></tr></thead>
+        <tbody>
+          <tr><td>Accuracy</td><td>(TP + TN) / all</td><td>How often is the system right overall?</td><td>930 / 1,000 = 93%</td></tr>
+          <tr><td>Precision</td><td>TP / (TP + FP)</td><td>When it raises an alert, is the driver really drowsy?</td><td>80 / 130 = 61.5%</td></tr>
+          <tr><td>Recall</td><td>TP / (TP + FN)</td><td>Of all drowsy moments, how many did it catch?</td><td>80 / 100 = 80%</td></tr>
+          <tr><td>F1 score</td><td>2 · P · R / (P + R)</td><td>A single balance of precision and recall</td><td>69.6%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>Why accuracy alone misleads:</strong> drivers are alert most of the time. A useless system that <em>always</em> answers "alert" would score 90% accuracy on this data, with a recall of zero. Always report precision and recall for the drowsy class.</p>
+      <p>In a car, the two kinds of error cost different things. A <strong>false negative</strong> (low recall) is a missed drowsy driver, the dangerous failure. A <strong>false positive</strong> (low precision) is a false alarm, which sounds harmless but isn't: drivers who hear too many false alarms start ignoring the system or switch it off. Good systems are usually tuned for high recall, then pushed to keep false alarms rare.</p>
+      <p>Object detectors such as YOLO are usually scored with <strong>mAP@0.5</strong>: the area under the precision-recall curve, counting a detection as correct when its box overlaps the true box by at least 50% <a class="cite" href="bibliography.html#ref6">[6]</a>. For a deployed system, two practical measures are often more telling than any of these: <strong>false alarms per hour of driving</strong>, and <strong>detection delay</strong>, the time between drowsiness starting and the alert sounding.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Drowsiness datasets trade realism for safety: NTHU-DDD is acted but controlled; UTA-RLDD is real but varied.</li>
+          <li>Labels are uncertain; even human observers judged alertness correctly less than 60% of the time on real videos.</li>
+          <li>Always split by person, not by frame, or results will look better than they are.</li>
+          <li>Report precision and recall, not just accuracy, and think in false alarms per hour and detection delay for real cars.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
@@ -40,5 +126,6 @@
   </main>
 </div>
 <script src="js/site.js"></script>
+<script src="js/split-lab.js"></script>
 </body>
 </html>
