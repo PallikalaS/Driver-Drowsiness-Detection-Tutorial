@@ -344,3 +344,14 @@ details pre { margin-bottom: 0; }
 .interview blockquote p { margin: .4rem 0; }
 .interview blockquote ul { margin: .3rem 0 .5rem; padding-left: 1.3rem; columns: 2; }
 @media (max-width: 640px) { .interview blockquote ul { columns: 1; } }
+
+/* interviewee card (Section 10) */
+.interviewee { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center; background: var(--night); color: #DCE4EC; border-radius: 12px; padding: 1rem 1.2rem; margin: .2rem 0 1rem; }
+.interviewee .badge { width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--amber); color: #1A1204; display: grid; place-items: center; font-family: var(--head); font-weight: 700; font-size: 1.35rem; }
+.interviewee .label { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber); font-weight: 700; margin: 0; }
+.interviewee .name { font-family: var(--head); font-size: 1.6rem; font-weight: 700; color: #fff; margin: .1rem 0 .15rem; line-height: 1.15; }
+.interviewee .role { margin: 0 0 .35rem; font-size: .97rem; }
+.interviewee .paper { margin: 0; font-size: .92rem; color: #B8C4D0; }
+.interviewee .paper a { color: var(--amber); }
+.interviewee .paper em { color: #fff; font-style: normal; font-weight: 700; }
+@media (max-width: 560px) { .interviewee { grid-template-columns: 1fr; } }
