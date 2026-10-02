@@ -93,17 +93,42 @@
 
       <h2>Interview with a researcher</h2>
       <div class="interview">
-        <p class="todo">Replace this box with your interview results. Suggested structure: who you contacted and why (name, title, institution, and the paper of theirs this tutorial cites); the questions you asked; their answers, quoted with permission; and one or two sentences connecting their answers to the challenges above. If no one replies in time, keep the list of researchers you contacted and the date you wrote, and note that the challenges on this page are drawn from their published papers instead.</p>
-        <h3>Researchers contacted</h3>
-        <p class="todo">List the authors and lab directors you emailed, with institution and date sent.</p>
-        <p class="q">1. What do you see as the biggest remaining challenge in camera-based drowsiness detection for real driving?</p>
-        <p class="todo">Answer, quoted.</p>
-        <p class="q">2. How well do landmark measures like EAR hold up against deep learning today, and when would you still choose them?</p>
-        <p class="todo">Answer, quoted.</p>
-        <p class="q">3. How should systems handle sunglasses, nighttime driving, or drivers whose eyes look naturally narrow?</p>
-        <p class="todo">Answer, quoted.</p>
-        <p class="q">4. Where do you think driver monitoring research is heading in the next few years?</p>
-        <p class="todo">Answer, quoted.</p>
+        <p class="who">I emailed the authors of several papers cited in this tutorial. Dr. Christine Dewi, University Lecturer at Satya Wacana Christian University in Indonesia and lead author of the EAR threshold study in reference <a class="cite" href="bibliography.html#ref5">[5]</a>, kindly answered four questions by email in October 2026. Her answers are quoted below exactly as she wrote them, with credit, as described in my request.</p>
+
+        <p class="q-text">1. What do you see as the biggest remaining challenge in camera-based drowsiness detection for real driving conditions?</p>
+        <blockquote>
+          <p>"The biggest remaining challenge is robustness in real driving environments. Although the paper shows that EAR can detect eye closure effectively in video sequences, real driving conditions are much more difficult because the system must handle different lighting, head movements, facial structures, glasses, camera angles, and driver behavior. The paper itself notes that blink rate and eye behavior vary depending on environmental conditions, concentration, age, gender, and individual differences. It also mentions challenges such as small eyes, wearing glasses, and driving a car, which can affect detection results. So, the main remaining challenge is not only detecting blinks in a dataset, but ensuring the system remains accurate and stable across many drivers and real road conditions."</p>
+        </blockquote>
+
+        <p class="q-text">2. How well do landmark-based measures like EAR hold up against deep learning approaches today, and when would you still choose them?</p>
+        <blockquote>
+          <p>"Landmark-based methods like EAR still hold up well as a simple, fast, interpretable, and low-cost baseline. The paper emphasizes that EAR only requires basic calculations using distances between eye landmarks, making it fast and efficient for real-time use. However, compared with deep learning, EAR has limitations. It depends heavily on accurate facial landmark detection and fixed threshold selection. Modern deep learning methods can learn more complex visual patterns, including eye state, facial expression, head pose, and temporal behavior. Recent reviews show that vision-based drowsiness systems have advanced through deep learning and transformer-based models, but they still face illumination and occlusion challenges. So, EAR is still useful, especially for lightweight and explainable systems, but deep learning is stronger when the environment is complex and sufficient training data is available."</p>
+        </blockquote>
+
+        <p class="q-text">3. How should systems handle difficult cases such as sunglasses, nighttime driving, or drivers whose eyes look naturally narrow?</p>
+        <blockquote>
+          <p>"Systems should not rely only on a single fixed EAR threshold. The paper tested several thresholds, including 0.18, 0.20, 0.225, and 0.25, and found that 0.18 performed best in their experiments. It also reports that higher EAR thresholds worsened accuracy and AUC performance."</p>
+        </blockquote>
+
+        <p class="q-text">4. What direction do you think driver monitoring research will take in the next few years?</p>
+        <blockquote>
+          <p>"Driver monitoring research will likely move toward hybrid, personalized, multimodal, and edge-deployable systems. The paper is important because it shows that a simple EAR-based system can be used for real-time blink detection. But future systems will likely combine EAR with other signals, such as:</p>
+          <ul>
+            <li>PERCLOS,</li>
+            <li>mouth aspect ratio/yawning,</li>
+            <li>head pose,</li>
+            <li>gaze direction,</li>
+            <li>facial expression,</li>
+            <li>steering behavior,</li>
+            <li>physiological signals,</li>
+            <li>deep learning-based eye-state classification.</li>
+          </ul>
+          <p>This direction is supported by recent reviews, which report that future driver monitoring systems are moving toward hybrid architectures, multimodal fusion, and validation under diverse real-world conditions.</p>
+          <p>A good future direction based on this paper would be: Combine EAR-based blink detection with deep learning, personalized threshold calibration, and multimodal driver-state analysis to improve robustness in real-world driving conditions."</p>
+        </blockquote>
+
+        <h3>What the interview adds</h3>
+        <p>Dr. Dewi's answers line up closely with the rest of this tutorial. Her biggest challenge, staying accurate "across many drivers and real road conditions," is exactly the gap between lab results and real driving described on this page and in Section 9. Her view of EAR versus deep learning matches the trade-off in Sections 6 and 7: EAR for lightweight, explainable systems, deep learning when conditions are complex and training data is plentiful. Her advice not to rely on a single fixed threshold is the same lesson as the calibration tool above, now backed by the person who measured it. And the signals she lists for future systems, from PERCLOS and yawning to head pose and steering behavior, cover nearly every section of this tutorial, which points to the conclusion in Section 12: the strongest systems will combine them rather than depend on any one.</p>
       </div>
 
       <section class="takeaways">

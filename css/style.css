@@ -336,3 +336,11 @@ details pre { margin-bottom: 0; }
 .journey li { counter-increment: j; padding-left: 2.4rem; position: relative; margin: .6rem 0; }
 .journey li::before { content: counter(j); position: absolute; left: 0; top: .05rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--night); color: var(--amber); font-family: var(--head); font-weight: 700; display: grid; place-items: center; font-size: .95rem; }
 @media (max-width: 700px) { .labs { grid-template-columns: 1fr; } }
+
+/* ---------- interview (Section 10) ---------- */
+.interview .who { font-size: .95rem; color: var(--muted); margin: 0 0 .6rem; }
+.interview .q-text { font-weight: 700; font-family: var(--head); font-size: 1.12rem; margin: 1.3rem 0 .4rem; }
+.interview blockquote { margin: .3rem 0 .6rem; }
+.interview blockquote p { margin: .4rem 0; }
+.interview blockquote ul { margin: .3rem 0 .5rem; padding-left: 1.3rem; columns: 2; }
+@media (max-width: 640px) { .interview blockquote ul { columns: 1; } }
