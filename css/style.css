@@ -309,3 +309,15 @@ figure img { border-radius: 10px; border: 1px solid var(--line); background: #ff
 .sys-card dl { display: grid; grid-template-columns: 7rem 1fr; gap: .35rem .8rem; margin: 0; }
 .sys-card dt { font-weight: 700; } .sys-card dd { margin: 0; }
 @media (max-width: 640px) { .sys-card dl { grid-template-columns: 1fr; } }
+
+/* ---------- calibration lab (Section 10) ---------- */
+.calib-lab { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.2rem 1.2rem; }
+.calib-lab h3 { margin: 0 0 .4rem; }
+.calib-lab label { display: flex; justify-content: space-between; font-weight: 700; margin: .6rem 0 .2rem; }
+.calib-lab label output { color: var(--amber-ink); font-variant-numeric: tabular-nums; }
+.calib-lab input[type=range] { width: 100%; accent-color: var(--amber); }
+.calib-lab table { margin-top: .8rem; }
+.calib-lab td.ok { background: #E5F3EA; } .calib-lab td.bad { background: #FBE9E7; font-weight: 700; }
+.interview { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--amber); border-radius: 0 12px 12px 0; padding: .9rem 1.2rem; margin: 1.2rem 0; }
+.interview h3 { margin-top: .2rem; }
+.interview .q { font-weight: 700; margin: 1rem 0 .3rem; background: none; border: 0; padding: 0; }

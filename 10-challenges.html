@@ -16,28 +16,105 @@
     <article class="content">
       <p class="page-num">Section 10 of 12</p>
       <h1>Real-World Challenges</h1>
-      <p class="lead">A system that works in the lab can still fail on a dark highway. These are the hardest problems.</p>
+      <p class="lead">A system that works in the lab can still fail on a dark highway. These are the hardest problems, why they happen, and what engineers do about them.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/10-challenges.mp3">Your browser does not support audio playback.</audio>
       </div>
+
+      <p>Section 9 showed that almost every failure traces back to the real world being more varied than the data a system was built on. This page takes the challenges one at a time. For each, it explains what goes wrong inside the pipeline from Sections 2 to 5, then what helps.</p>
+
       <h2>Poor lighting and nighttime driving</h2>
-      <p class="todo">Explain why near-infrared cameras and illumination-aware preprocessing help <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
-      <figure>
-        <div class="fig-placeholder">Figure 12 goes here: The same driver in daylight, at night, and wearing sunglasses<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 12. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
-      </figure>
+      <p><strong>What goes wrong.</strong> An ordinary RGB camera needs light. At night the face is dark and noisy, and the landmark model starts guessing; small errors in eyelid points become large errors in EAR, because the eye opening is only a few pixels tall. Daytime brings its own problems: harsh sun from one side, deep shadows under the brow, and light that flickers as the car passes trees, bridges, and tunnels.</p>
+      <p>Low light also tends to reduce frame rate. In the NTHU-DDD benchmark, the night videos run at 15 frames per second instead of 30 <a class="cite" href="bibliography.html#ref11">[11]</a>. At 15 fps, a quick 100-millisecond blink spans only one or two frames, so the timing rules from Section 3 have far less to work with.</p>
+      <p><strong>What helps.</strong> The most effective fix is hardware: a <strong>near-infrared camera with its own infrared lighting</strong>, as production systems use, gives an evenly lit image regardless of time of day. In software, contrast normalization (such as adaptive histogram equalization) evens out shadows before landmark detection, and training data must include night footage, which is exactly why benchmarks like NTHU-DDD record night scenarios <a class="cite" href="bibliography.html#ref11">[11]</a>.</p>
+
       <h2>Glasses, sunglasses, and occlusion</h2>
-      <p class="todo">Cover lens reflections, hidden eyes, and fallback signals <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
+      <p><strong>What goes wrong.</strong> Clear glasses add reflections and frame edges right where the eyelid landmarks should be. Dark sunglasses hide the eyes entirely, so EAR and PERCLOS become meaningless. Hands, masks, hair, and a raised coffee cup hide the mouth or part of the face. Fixed-threshold EAR is known to be sensitive to glasses and partial occlusion <a class="cite" href="bibliography.html#ref6">[6]</a>, and a hand over the mouth was the main reason yawn precision dropped to 36.84% in one study <a class="cite" href="bibliography.html#ref3">[3]</a>. These aren't edge cases: in the real-life UTA-RLDD videos, participants wore glasses in 21 of 180 recordings <a class="cite" href="bibliography.html#ref10">[10]</a>.</p>
+      <p><strong>What helps.</strong></p>
+      <ul>
+        <li><strong>Infrared imaging</strong>, which often sees through sunglass lenses that block visible light (Section 2).</li>
+        <li><strong>Fallback cues:</strong> when the eyes can't be measured, rely more on head pose and yawning (Sections 4 and 5).</li>
+        <li><strong>Confidence-aware fusion:</strong> landmark models can report how confident they are. A well-designed system lowers the weight of a measurement when its confidence drops, instead of trusting a guessed eyelid position.</li>
+        <li><strong>Training data with eyewear</strong>, such as NTHU-DDD's glasses and sunglasses scenarios <a class="cite" href="bibliography.html#ref11">[11]</a>.</li>
+      </ul>
+
       <h2>Differences among drivers</h2>
-      <p class="todo">Use the finding in <a class="cite" href="bibliography.html#ref3">[3]</a>: drivers with naturally smaller eyes had EAR below the threshold even with eyes open, causing false alarms. Explain per-driver calibration as the fix, and camera-angle sensitivity <a class="cite" href="bibliography.html#ref7">[7]</a>.</p>
+      <p><strong>What goes wrong.</strong> Every threshold in this tutorial assumes an "average" face, and nobody is average. Eye shape varies widely: some people's normal open eyes give an EAR well below others'. Age changes eyelids, facial hair covers the mouth and jaw landmarks (72 of the 180 UTA-RLDD videos showed considerable facial hair <a class="cite" href="bibliography.html#ref10">[10]</a>), and normal blink rates differ from person to person.</p>
+      <p>Zambrano et al. measured this directly. Across 27 alert drivers, the average open-eye EAR was 0.257 with a standard deviation of 0.021, and the system used a fixed threshold of 0.23 <a class="cite" href="bibliography.html#ref3">[3]</a>. That worked for most people, but drivers with naturally smaller eyes sat below 0.23 while fully alert and were wrongly flagged as drowsy <a class="cite" href="bibliography.html#ref3">[3]</a>. Camera angle adds another layer: the same eye gives a different EAR when seen from the side, which is why researchers are developing 3D measures that stay stable as the viewpoint changes <a class="cite" href="bibliography.html#ref7">[7]</a>.</p>
+      <p><strong>What helps: per-driver calibration.</strong> During the first minute or so of driving, when the driver is presumably alert, the system records their typical open-eye EAR (the median works well because it ignores blinks). It then sets each threshold relative to that baseline, for example at 75% of it. Try it:</p>
+
+      <figure>
+        <div class="calib-lab">
+          <h3>Try it: one fixed threshold vs. a calibrated one</h3>
+          <label for="cal-base">This driver's normal open-eye EAR <output id="cal-base-o">0.26</output></label>
+          <input id="cal-base" type="range" min="18" max="34" value="26">
+          <p>Fixed threshold: <strong>0.23</strong> for everyone &nbsp;·&nbsp; Calibrated threshold: 75% of baseline = <strong id="cal-thr"></strong></p>
+          <div class="table-wrap">
+          <table>
+            <thead><tr><th>Situation</th><th>EAR</th><th>Fixed rule says</th><th>Calibrated rule says</th></tr></thead>
+            <tbody>
+              <tr><td>Alert, eyes normally open</td><td id="cal-open-ear"></td><td id="cal-open-fixed"></td><td id="cal-open-cal"></td></tr>
+              <tr><td>Drowsy, eyes half closed</td><td id="cal-half-ear"></td><td id="cal-half-fixed"></td><td id="cal-half-cal"></td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p id="cal-note" aria-live="polite"></p>
+        </div>
+        <figcaption>Figure 12. Interactive comparison of a fixed EAR threshold (0.23, as used in <a class="cite" href="bibliography.html#ref3">[3]</a>) and a threshold calibrated to each driver's baseline. Drag the slider below about 0.23 to recreate the small-eyes false alarm. The 75% ratio is illustrative. Created by the author.</figcaption>
+      </figure>
+
+      <p>Calibration has its own risk: if a driver starts the trip already drowsy, the baseline is wrong from the start. Practical systems cap how far the calibrated threshold can move from typical values and keep updating the baseline slowly during alert stretches.</p>
+
+      <h2>Vibration, motion, and computing limits</h2>
+      <p>A real car moves. Road vibration shakes the camera, especially a phone in a dashboard mount, blurring the eye region and making landmarks jitter from frame to frame. Smoothing each measurement over a few frames (for example, a short moving average of EAR) reduces jitter without hiding real closures. Meanwhile the whole pipeline must fit in the roughly 33 milliseconds per frame from Section 1, on hardware that may also be running navigation and music, and on a phone that heats up and throttles its processor in a sunny windshield. This is why efficient models such as YOLOv11n are attractive for embedded use <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
+
       <h2>False alarms and missed detections</h2>
-      <p class="todo">Explain the cost of each and how alert fatigue makes drivers switch systems off.</p>
+      <p>Section 8 showed that the two kinds of error cost different things. In a real car, the balance between them decides whether the system helps at all:</p>
+      <ul>
+        <li><strong>Missed detections</strong> are the dangerous failure: the system stays quiet while the driver drifts toward a microsleep.</li>
+        <li><strong>False alarms</strong> erode trust. A driver who hears the alarm while feeling fine learns to ignore it, and many will switch the system off, at which point its accuracy no longer matters.</li>
+      </ul>
+      <p>Good designs soften this trade-off with <strong>graded warnings</strong> instead of a single loud alarm: a gentle "consider a break" message when PERCLOS or yawning shows drowsiness building, and an urgent sound or seat vibration only for a long eye closure or a nod. The EU rules reflect the same idea of warning early: a drowsiness warning system may warn at level 7 on the Karolinska Sleepiness Scale ("sleepy, but no effort to keep awake"), before drowsiness becomes severe <a class="cite" href="bibliography.html#ref12">[12]</a>.</p>
+
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Challenge</th><th>What it breaks</th><th>Main mitigations</th></tr></thead>
+        <tbody>
+          <tr><td>Darkness and harsh light</td><td>Landmark accuracy, frame rate</td><td>Near-infrared camera and lighting; contrast normalization; night training data</td></tr>
+          <tr><td>Glasses, sunglasses, hands</td><td>EAR, PERCLOS, MAR</td><td>Infrared; fall back to head pose; confidence-aware fusion</td></tr>
+          <tr><td>Different faces and ages</td><td>Fixed thresholds</td><td>Per-driver calibration</td></tr>
+          <tr><td>Camera angle</td><td>2D measurements like EAR</td><td>Head-pose correction; 3D measures <a class="cite" href="bibliography.html#ref7">[7]</a></td></tr>
+          <tr><td>Vibration and limited hardware</td><td>Landmark stability, speed</td><td>Smoothing; efficient models; frame skipping</td></tr>
+          <tr><td>False alarms</td><td>Driver trust</td><td>Graded warnings; reasoning over time</td></tr>
+        </tbody>
+      </table>
+      </div>
+
       <h2>Interview with a researcher</h2>
-      <p class="todo">Add the results of your email interview here: who you contacted, their role, and their answers (quoted with permission). If no reply arrives in time, list who you contacted and summarize the challenges the paper authors describe.</p>
-      <blockquote>
-        <p class="todo">Researcher's quoted answer goes here, followed by their name, title, and institution.</p>
-      </blockquote>
+      <div class="interview">
+        <p class="todo">Replace this box with your interview results. Suggested structure: who you contacted and why (name, title, institution, and the paper of theirs this tutorial cites); the questions you asked; their answers, quoted with permission; and one or two sentences connecting their answers to the challenges above. If no one replies in time, keep the list of researchers you contacted and the date you wrote, and note that the challenges on this page are drawn from their published papers instead.</p>
+        <h3>Researchers contacted</h3>
+        <p class="todo">List the authors and lab directors you emailed, with institution and date sent.</p>
+        <p class="q">1. What do you see as the biggest remaining challenge in camera-based drowsiness detection for real driving?</p>
+        <p class="todo">Answer, quoted.</p>
+        <p class="q">2. How well do landmark measures like EAR hold up against deep learning today, and when would you still choose them?</p>
+        <p class="todo">Answer, quoted.</p>
+        <p class="q">3. How should systems handle sunglasses, nighttime driving, or drivers whose eyes look naturally narrow?</p>
+        <p class="todo">Answer, quoted.</p>
+        <p class="q">4. Where do you think driver monitoring research is heading in the next few years?</p>
+        <p class="todo">Answer, quoted.</p>
+      </div>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Infrared cameras solve most lighting problems; software alone can't fully fix a dark image.</li>
+          <li>When the eyes are hidden, fall back to head pose and yawning, weighted by how confident each measurement is.</li>
+          <li>Fixed thresholds fail for some faces; calibrating to each driver's own baseline fixes the most common false alarm.</li>
+          <li>False alarms are not harmless: graded warnings protect driver trust while still catching real drowsiness.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
@@ -45,5 +122,6 @@
   </main>
 </div>
 <script src="js/site.js"></script>
+<script src="js/calib-lab.js"></script>
 </body>
 </html>
