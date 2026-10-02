@@ -22,15 +22,15 @@
         <audio controls preload="none" src="audio/03-eye-detection.mp3">Your browser does not support audio playback.</audio>
       </div>
       <h2>Detecting open and closed eyes</h2>
-      <p class="todo">Explain the general idea, and mention classic methods such as thresholding and template matching from the PERCLOS grayscale paper <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+      <p class="todo">Explain the two ways to decide eye state in each frame: geometrically from landmarks (EAR, below) or with a CNN that classifies cropped eye images as open or closed (covered in Section 7).</p>
       <figure>
         <div class="fig-placeholder">Figure 4 goes here: EAR landmarks on an open eye and a closed eye, with an EAR-over-time plot showing blinks<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 4. Caption describing the image. Source: where the image came from, with a link <a class="cite" href="bibliography.html#ref1">[1]</a>.</figcaption>
+        <figcaption>Figure 4. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
       </figure>
       <h2>Eye Aspect Ratio (EAR)</h2>
-      <p class="todo">Explain each landmark p1 to p6, walk through the formula below, and give typical values (open eye about 0.25 to 0.30, closed below 0.20). Link to the animated eye on the home page.</p>
+      <p class="todo">EAR was introduced by Soukupová and Čech <a class="cite" href="bibliography.html#ref3">[3]</a> and is still the standard landmark-based measure <a class="cite" href="bibliography.html#ref4">[4]</a>. Explain each landmark p1 to p6, walk through the formula below, and give typical values: open eyes around 0.25 to 0.30, with closure thresholds usually set between 0.15 and 0.25 <a class="cite" href="bibliography.html#ref5">[5]</a>. Link to the animated eye on the home page.</p>
       <div class="formula">EAR = ( ‖p2 − p6‖ + ‖p3 − p5‖ ) / ( 2 · ‖p1 − p4‖ )</div>
-      <p class="todo">Explain why the denominator is weighted by 2, and why a ratio stays stable when the driver moves closer to or farther from the camera.</p>
+      <p class="todo">Explain why the denominator is weighted by 2, why a ratio stays stable when the driver moves closer to or farther from the camera, and why it still changes when the head turns <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
       <h2>Detecting blinks and prolonged eye closure</h2>
       <p class="todo">Explain the consecutive-frame rule: a blink drops EAR for about 100 to 400 ms, while drowsiness keeps it low much longer. Show how a frame threshold separates the two.</p>
       <h2>PERCLOS</h2>

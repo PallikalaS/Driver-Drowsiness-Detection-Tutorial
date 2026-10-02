@@ -22,24 +22,24 @@
       </div>
 
       <section class="ref" id="ref1">
-        <h3>[1] Real-Time Driver Drowsiness Detection System Based on PERCLOS and Grayscale Image Processing</h3>
+        <h3>[1] A Survey on Drowsiness Detection: Modern Applications and Methods</h3>
         <dl>
-          <dt>Authors</dt><dd>Jun-Juh Yan, Hang-Hong Kuo, Ying-Fan Lin, Teh-Lu Liao</dd>
-          <dt>Date</dt><dd>2016</dd>
-          <dt>Source</dt><dd>2016 International Symposium on Computer, Consumer and Control (IS3C), IEEE, pp. 243–246. <a href="https://doi.org/10.1109/IS3C.2016.72">doi:10.1109/IS3C.2016.72</a></dd>
-          <dt>Synopsis</dt><dd>Presents a real-time system that locates the driver's face in grayscale frames, finds the eyes with a small template, and builds a fatigue model for each driver from PERCLOS. The system monitors the driver continuously and issues an alert once fatigue is detected.</dd>
-          <dt>Reliability</dt><dd>Peer-reviewed IEEE conference paper by university researchers, including a faculty member at National Cheng Kung University. A short paper, so the evaluation is limited in scope.</dd>
+          <dt>Authors</dt><dd>Biying Fu, Fadi Boutros, Chin-Teng Lin, Naser Damer</dd>
+          <dt>Date</dt><dd>2024</dd>
+          <dt>Source</dt><dd>IEEE Transactions on Intelligent Vehicles. <a href="https://doi.org/10.1109/TIV.2024.3395889">doi:10.1109/TIV.2024.3395889</a></dd>
+          <dt>Synopsis</dt><dd>A broad review of drowsiness detection that covers detection methods, open difficulties, and recent developments in real-time sleepiness monitoring, including where computer vision fits alongside physiological and vehicle-based approaches. Used in this tutorial for background, the overview of method families, and future directions.</dd>
+          <dt>Reliability</dt><dd>High. A peer-reviewed survey in a leading IEEE journal on intelligent vehicles, written by researchers including members of the Fraunhofer Institute for Computer Graphics Research.</dd>
         </dl>
       </section>
 
       <section class="ref" id="ref2">
-        <h3>[2] Driver Drowsiness Classification Based on Eye Blink and Head Movement Features Using the k-NN Algorithm</h3>
+        <h3>[2] Driver Monitoring System Using Computer Vision for Real-Time Detection of Fatigue, Distraction and Emotion via Facial Landmarks and Deep Learning</h3>
         <dl>
-          <dt>Authors</dt><dd>Mariella Dreißig, Mohamed Hedi Baccour, Tim Schäck, Enkelejda Kasneci</dd>
-          <dt>Date</dt><dd>2020</dd>
-          <dt>Source</dt><dd>2020 IEEE Symposium Series on Computational Intelligence (SSCI), pp. 889–896. <a href="https://doi.org/10.1109/SSCI47803.2020.9308133">doi:10.1109/SSCI47803.2020.9308133</a>. Free preprint: <a href="https://arxiv.org/abs/2009.13276">arXiv:2009.13276</a></dd>
-          <dt>Synopsis</dt><dd>Extends in-vehicle drowsiness detection by using signals from a driver monitoring camera instead of only steering and lane data. Develops a k-Nearest Neighbor based feature-selection method over eye-blink and head-movement features, and shows which feature sets best capture how sleepiness changes blink behavior and head motion.</dd>
-          <dt>Reliability</dt><dd>Peer-reviewed IEEE symposium paper. The senior author is a university professor who leads a human-computer interaction research group.</dd>
+          <dt>Authors</dt><dd>Tamia Zambrano, Luis Arias, Edgar Haro, Victor Santos, María Trujillo-Guerrero</dd>
+          <dt>Date</dt><dd>January 2026</dd>
+          <dt>Source</dt><dd>Sensors, vol. 26, no. 3, article 889. <a href="https://doi.org/10.3390/s26030889">doi:10.3390/s26030889</a> (open access)</dd>
+          <dt>Synopsis</dt><dd>Builds a real-time driver monitor that uses MediaPipe's 468 facial landmarks to compute the Eye Aspect Ratio, Mouth Aspect Ratio, gaze, and head pose, plus a MobileNetV2 network for emotion recognition. Tested with 27 drivers in real and simulated driving, it detected eye closure with 88.89% accuracy and yawning with 85.19%. The authors report that drivers with naturally smaller eyes triggered false drowsiness alerts under a fixed EAR threshold, and recommend per-driver calibration.</dd>
+          <dt>Reliability</dt><dd>Medium-high. Peer-reviewed, open-access journal article with a clearly described method and published results. The test group is small (27 participants from one region) and sessions were short, so results may not generalize.</dd>
         </dl>
       </section>
 
@@ -48,31 +48,64 @@
         <dl>
           <dt>Authors</dt><dd>Tereza Soukupová, Jan Čech</dd>
           <dt>Date</dt><dd>2016</dd>
-          <dt>Source</dt><dd>21st Computer Vision Winter Workshop (CVWW). Add the link after you look it up.</dd>
-          <dt>Synopsis</dt><dd class="todo">Summarize in your own words after reading: introduces the Eye Aspect Ratio.</dd>
-          <dt>Reliability</dt><dd class="todo">Rate the source after reading it.</dd>
+          <dt>Source</dt><dd>21st Computer Vision Winter Workshop (CVWW), 2016.</dd>
+          <dt>Synopsis</dt><dd>The paper that introduced the Eye Aspect Ratio: a single number computed from six landmarks around each eye that drops toward zero as the eye closes, used to detect blinks in real time. Cited here as the original source of EAR; the other references show how it is used today.</dd>
+          <dt>Reliability</dt><dd>Medium-high. A workshop paper rather than a journal article, but it is the foundational and most widely cited source for EAR, referenced by every recent paper in this bibliography.</dd>
         </dl>
       </section>
 
       <section class="ref" id="ref4">
-        <h3>[4] Reference for the NTHU Driver Drowsiness Detection Dataset</h3>
+        <h3>[4] Eye Aspect Ratio for Real-Time Drowsiness Detection to Improve Driver Safety</h3>
         <dl>
-          <dt>Authors</dt><dd class="todo">Look up the paper that introduced the dataset (NTHU Computer Vision Lab).</dd>
-          <dt>Date</dt><dd>To fill in</dd>
-          <dt>Source</dt><dd>To fill in</dd>
-          <dt>Synopsis</dt><dd>To fill in</dd>
-          <dt>Reliability</dt><dd>To fill in</dd>
+          <dt>Authors</dt><dd>C. Dewi, R.-C. Chen, C.-W. Chang, S.-H. Wu, X. Jiang, H. Yu</dd>
+          <dt>Date</dt><dd>2022</dd>
+          <dt>Source</dt><dd>Electronics, vol. 11, article 3183. <a href="https://doi.org/10.3390/electronics11193183">doi:10.3390/electronics11193183</a> (open access)</dd>
+          <dt>Synopsis</dt><dd>Applies the Eye Aspect Ratio to real-time driver drowsiness detection and is cited by later systems as a reference for computing EAR from facial landmarks.<p class="todo">Add one or two sentences on its method and results after skimming the paper.</p></dd>
+          <dt>Reliability</dt><dd>Medium. Peer-reviewed, open-access journal article.</dd>
         </dl>
       </section>
 
       <section class="ref" id="ref5">
-        <h3>[5] Deep learning drowsiness reference</h3>
+        <h3>[5] Vision-Based Driver Drowsiness Monitoring: Comparative Analysis of YOLOv5–v11 Models</h3>
         <dl>
-          <dt>Authors</dt><dd class="todo">Choose a CNN or CNN + LSTM drowsiness paper for Section 7.</dd>
-          <dt>Date</dt><dd>To fill in</dd>
-          <dt>Source</dt><dd>To fill in</dd>
-          <dt>Synopsis</dt><dd>To fill in</dd>
-          <dt>Reliability</dt><dd>To fill in</dd>
+          <dt>Authors</dt><dd>Dilshara Herath, Chinthaka Abeyrathne, Prabhani Jayaweera (University of Ruhuna, Sri Lanka)</dd>
+          <dt>Date</dt><dd>2025</dd>
+          <dt>Source</dt><dd>arXiv preprint 2509.17498. <a href="https://arxiv.org/abs/2509.17498">arxiv.org/abs/2509.17498</a></dd>
+          <dt>Synopsis</dt><dd>Fine-tunes seven YOLO object detectors (v5 through v11) on images from the UTA Real-Life Drowsiness Dataset and compares them with a classic Dlib-based EAR method. YOLOv9c was the most accurate (mAP@0.5 of 0.986), YOLOv11n gave the best balance of accuracy and speed for embedded devices, and the EAR method reached about 0.81 precision while being far cheaper to run. The authors explain that EAR's fixed threshold makes it sensitive to head pose, glasses, and lighting.</dd>
+          <dt>Reliability</dt><dd>Medium. A preprint that has not been peer reviewed, by university researchers. The method and numbers are reported in detail, but the evaluation uses a subset of 18 participants and a frame-level split.</dd>
+        </dl>
+      </section>
+
+      <section class="ref" id="ref6">
+        <h3>[6] Blinking Beyond EAR: A Stable Eyelid Angle Metric for Driver Drowsiness Detection and Data Augmentation</h3>
+        <dl>
+          <dt>Authors</dt><dd>Mathis Wolter, Julie Stephany Berrio Perez, Mao Shan</dd>
+          <dt>Date</dt><dd>November 2025</dd>
+          <dt>Source</dt><dd>arXiv preprint 2511.19519. <a href="https://arxiv.org/abs/2511.19519">arxiv.org/abs/2511.19519</a></dd>
+          <dt>Synopsis</dt><dd>Proposes the Eyelid Angle (ELA), a measure of eye openness computed from 3D facial landmarks that stays stable when the camera angle changes, unlike the 2D Eye Aspect Ratio. On public driver-monitoring datasets it showed lower variance than EAR under viewpoint changes and detected blinks accurately. The authors also use it to generate synthetic training data.</dd>
+          <dt>Reliability</dt><dd>Medium. A recent preprint that has not been peer reviewed. Included as an example of where eye-openness measurement is heading.</dd>
+        </dl>
+      </section>
+
+      <section class="ref" id="ref7">
+        <h3>[7] Real-Time Deep Learning-Based Drowsiness Detection: Leveraging Computer-Vision and Eye-Blink Analyses for Enhanced Road Safety</h3>
+        <dl>
+          <dt>Authors</dt><dd>F. Safarov, F. Akhmedov, A. B. Abdusalomov, R. Nasimov, Y. I. Cho</dd>
+          <dt>Date</dt><dd>2023</dd>
+          <dt>Source</dt><dd>Sensors, vol. 23, no. 14, article 6459. <a href="https://doi.org/10.3390/s23146459">doi:10.3390/s23146459</a> (open access)</dd>
+          <dt>Synopsis</dt><dd>A CNN-based framework that combines facial landmark tracking with deep learning to detect blinking and yawning in real time. Later work reports its eye-based fatigue detection accuracy as 95.8%.<p class="todo">Confirm the reported accuracy and add a sentence on the network design after skimming the paper.</p></dd>
+          <dt>Reliability</dt><dd>Medium-high. Peer-reviewed, open-access journal article, widely cited by later driver monitoring papers.</dd>
+        </dl>
+      </section>
+
+      <section class="ref" id="ref8">
+        <h3>[8] Real-Time Driver Drowsiness Detection Using Transformer Architectures: A Novel Deep Learning Approach</h3>
+        <dl>
+          <dt>Authors</dt><dd>O. Hassan, A. Ibrahim, A. Gomaa</dd>
+          <dt>Date</dt><dd>2025</dd>
+          <dt>Source</dt><dd>Scientific Reports, vol. 15. <a href="https://doi.org/10.1038/s41598-025-02111-x">doi:10.1038/s41598-025-02111-x</a> (open access)</dd>
+          <dt>Synopsis</dt><dd>Applies transformer architectures, which model relationships across a whole image or sequence, to real-time driver drowsiness detection.<p class="todo">Add the architecture, dataset, and results after skimming the paper.</p></dd>
+          <dt>Reliability</dt><dd>High. Peer-reviewed article in Scientific Reports, a Nature Portfolio journal.</dd>
         </dl>
       </section>
 
