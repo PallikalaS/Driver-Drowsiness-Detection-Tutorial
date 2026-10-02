@@ -16,7 +16,7 @@
     <article class="content">
       <p class="page-num">Section 11 of 12</p>
       <h1>Experimental Demonstration</h1>
-      <p class="lead">A complete, working webcam program that puts Sections 2 to 10 together: it calibrates to your eyes, computes EAR, PERCLOS, and MAR in real time, and warns you when you look drowsy.</p>
+      <p class="lead">A complete webcam program that puts Sections 2 to 10 together: it calibrates to your eyes, computes EAR, PERCLOS, and MAR in real time, and warns you when you look drowsy.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/11-demo.mp3">Your browser does not support audio playback.</audio>
@@ -324,33 +324,23 @@ if __name__ == &quot;__main__&quot;:
       </table>
       </div>
 
-      <h2>Live test results</h2>
-      <p class="todo">Run the demo yourself and fill in this table from your own tests: the EAR baseline it measured for you, and what happened in each scenario. Your own measurements make this section original.</p>
-      <div class="table-wrap">
-      <table>
-        <thead><tr><th>Scenario</th><th>Expected</th><th>What happened</th></tr></thead>
-        <tbody>
-          <tr><td>Normal driving posture, 1 minute</td><td>"Alert" throughout</td><td>To fill in</td></tr>
-          <tr><td>Eyes closed for about 2 seconds (5 tries)</td><td>"WAKE UP" each time</td><td>To fill in</td></tr>
-          <tr><td>Three slow yawns</td><td>"Take a break" after the third</td><td>To fill in</td></tr>
-          <tr><td>Talking for 30 seconds</td><td>No yawns counted</td><td>To fill in</td></tr>
-          <tr><td>Wearing glasses</td><td>Same as without</td><td>To fill in</td></tr>
-          <tr><td>Dim room lighting</td><td>Works, possibly less stable</td><td>To fill in</td></tr>
-          <tr><td>Head turned about 30° to the side</td><td>May produce false closures (Section 5)</td><td>To fill in</td></tr>
-        </tbody>
-      </table>
-      </div>
-
-      <h2>Limitations of this demo</h2>
-      <p>This is a teaching demo, not a safety device. It uses an ordinary webcam rather than an infrared camera, so it struggles in the dark; it relies on 2D EAR, so turning your head can cause false closures; it has no head-pose nod detection; and its thresholds were chosen for illustration rather than tuned on a dataset. Each of these is one of the challenges from Section 10, and each has a known direction for improvement.</p>
+      <h2>Limitations of this design</h2>
+      <p>This is a teaching demo, not a safety device. Its decision logic was verified with the scripted test above, but it has not been evaluated on real drivers, and its design has known weaknesses that the research in this tutorial predicts:</p>
+      <ul>
+        <li><strong>An ordinary webcam, not an infrared camera,</strong> so it can be expected to struggle in dim light, as Section 10 explains.</li>
+        <li><strong>2D EAR,</strong> which changes when the head turns, so a side glance could register as a closure (Sections 3 and 5).</li>
+        <li><strong>No head-pose nod detection</strong>, so it relies on the eyes and mouth alone.</li>
+        <li><strong>Illustrative thresholds</strong> (75% of baseline, MAR 0.6, 1.5-second yawns) chosen to demonstrate the ideas, not tuned on a dataset as Section 8 recommends.</li>
+      </ul>
+      <p>Each of these matches one of the challenges in Section 10, and each has a known direction for improvement.</p>
 
       <section class="takeaways">
         <h2>Key takeaways</h2>
         <ul>
-          <li>About 180 lines of Python combine landmarks, EAR, PERCLOS, MAR, calibration, and graded warnings into a working detector.</li>
+          <li>About 180 lines of Python combine landmarks, EAR, PERCLOS, MAR, calibration, and graded warnings into one detector.</li>
           <li>Time-based limits keep the behavior consistent when the frame rate changes.</li>
           <li>Calibrating to each user's own baseline is a few lines of code and fixes the most common false alarm.</li>
-          <li>Testing the logic with a scripted virtual driver catches mistakes before any real-world testing.</li>
+          <li>Testing the logic with a scripted virtual driver catches mistakes before real-world testing, which is still needed before trusting any detector.</li>
         </ul>
       </section>
 
