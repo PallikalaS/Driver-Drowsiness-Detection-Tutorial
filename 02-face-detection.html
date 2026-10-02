@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detecting the Driver's Face | Driver Drowsiness Detection Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Semi+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar"><a class="brand" href="index.html">Driver Drowsiness Detection</a></aside>
+  <main>
+    <article class="content">
+      <p class="page-num">Section 2 of 12</p>
+      <h1>Detecting the Driver's Face</h1>
+      <p class="lead">Every later step depends on first finding the face and its key points in each video frame.</p>
+      <div class="narration">
+        <span>Listen to this page</span>
+        <audio controls preload="none" src="audio/02-face-detection.mp3">Your browser does not support audio playback.</audio>
+      </div>
+      <h2>Capturing the driver's face</h2>
+      <p class="todo">Cover camera placement (dashboard, steering column, A-pillar), RGB vs. near-infrared cameras, frame rate, and resolution.</p>
+      <figure>
+        <div class="fig-placeholder">Figure 2 goes here: Face detection bounding box on a driver image<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
+        <figcaption>Figure 2. Caption describing the image. Source: where the image came from, with a link <a class="cite" href="bibliography.html#ref1">[1]</a>.</figcaption>
+      </figure>
+      <h2>Face detection</h2>
+      <p class="todo">Explain Haar cascades (Viola-Jones), HOG + linear SVM, and CNN-based detectors. Compare speed and accuracy, and say when each is a good choice.</p>
+      <figure>
+        <div class="fig-placeholder">Figure 3 goes here: The 68 facial landmark points, numbered<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
+        <figcaption>Figure 3. Caption describing the image. Source: where the image came from, with a link <a class="cite" href="bibliography.html#ref1">[1]</a>.</figcaption>
+      </figure>
+      <h2>Facial landmark detection</h2>
+      <p class="todo">Explain the 68-point landmark model (dlib, regression trees) and MediaPipe Face Mesh (468 points). List which landmark indices belong to the eyes, mouth, and nose, since later pages rely on them.</p>
+
+      <nav class="pager" aria-label="Page navigation"></nav>
+      <footer class="site-footer"></footer>
+    </article>
+  </main>
+</div>
+<script src="js/site.js"></script>
+</body>
+</html>

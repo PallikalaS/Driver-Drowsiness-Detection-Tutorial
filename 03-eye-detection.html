@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eye-Based Drowsiness Detection | Driver Drowsiness Detection Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Semi+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar"><a class="brand" href="index.html">Driver Drowsiness Detection</a></aside>
+  <main>
+    <article class="content">
+      <p class="page-num">Section 3 of 12</p>
+      <h1>Eye-Based Drowsiness Detection</h1>
+      <p class="lead">The eyes are the strongest single signal of drowsiness. This page explains the two most widely used measurements.</p>
+      <div class="narration">
+        <span>Listen to this page</span>
+        <audio controls preload="none" src="audio/03-eye-detection.mp3">Your browser does not support audio playback.</audio>
+      </div>
+      <h2>Detecting open and closed eyes</h2>
+      <p class="todo">Explain the general idea, and mention classic methods such as thresholding and template matching from the PERCLOS grayscale paper <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+      <figure>
+        <div class="fig-placeholder">Figure 4 goes here: EAR landmarks on an open eye and a closed eye, with an EAR-over-time plot showing blinks<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
+        <figcaption>Figure 4. Caption describing the image. Source: where the image came from, with a link <a class="cite" href="bibliography.html#ref1">[1]</a>.</figcaption>
+      </figure>
+      <h2>Eye Aspect Ratio (EAR)</h2>
+      <p class="todo">Explain each landmark p1 to p6, walk through the formula below, and give typical values (open eye about 0.25 to 0.30, closed below 0.20). Link to the animated eye on the home page.</p>
+      <div class="formula">EAR = ( ‖p2 − p6‖ + ‖p3 − p5‖ ) / ( 2 · ‖p1 − p4‖ )</div>
+      <p class="todo">Explain why the denominator is weighted by 2, and why a ratio stays stable when the driver moves closer to or farther from the camera.</p>
+      <h2>Detecting blinks and prolonged eye closure</h2>
+      <p class="todo">Explain the consecutive-frame rule: a blink drops EAR for about 100 to 400 ms, while drowsiness keeps it low much longer. Show how a frame threshold separates the two.</p>
+      <h2>PERCLOS</h2>
+      <div class="formula">PERCLOS = (frames with eyes ≥ 80% closed) / (total frames in window) × 100%</div>
+      <p class="todo">Explain the P80 definition, typical window lengths (about 1 minute), and the alert thresholds used in the literature <a class="cite" href="bibliography.html#ref1">[1]</a>. Compare EAR (instant, per frame) with PERCLOS (summary over time).</p>
+
+      <nav class="pager" aria-label="Page navigation"></nav>
+      <footer class="site-footer"></footer>
+    </article>
+  </main>
+</div>
+<script src="js/site.js"></script>
+</body>
+</html>

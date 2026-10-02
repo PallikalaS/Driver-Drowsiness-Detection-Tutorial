@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz | Driver Drowsiness Detection Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Semi+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar"><a class="brand" href="index.html">Driver Drowsiness Detection</a></aside>
+  <main>
+    <article class="content">
+      <h1>Check your understanding</h1>
+      <p class="lead">Choose an answer for each question to see whether it's right and why. Nothing is graded or saved.</p>
+      <div class="narration">
+        <span>Listen to this page</span>
+        <audio controls preload="none" src="audio/quiz.mp3">Your browser does not support audio playback.</audio>
+      </div>
+      <div id="quiz"></div>
+      <p class="score" id="score" aria-live="polite"></p>
+      <button class="btn" id="reset" type="button">Start over</button>
+
+      <nav class="pager" aria-label="Page navigation"></nav>
+      <footer class="site-footer"></footer>
+    </article>
+  </main>
+</div>
+<script src="js/site.js"></script>
+<script src="js/quiz.js"></script>
+</body>
+</html>
