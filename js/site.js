@@ -60,8 +60,7 @@ const PAGES = [
   const footer = document.querySelector(".site-footer");
   if (footer) {
     footer.innerHTML =
-      `CS663 Computer Vision, Project 1. Written by Swathi Pallikala. ` +
-      `Image sources are credited in each caption; full references are in the <a href="bibliography.html">annotated bibliography</a>.`;
+      `Written by Swathi Pallikala.<br>Full references are in the <a href="bibliography.html">annotated bibliography</a>.`;
   }
 
   // ----- homepage eye demo -----
