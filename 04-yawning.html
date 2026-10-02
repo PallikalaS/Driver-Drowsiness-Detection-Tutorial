@@ -16,21 +16,142 @@
     <article class="content">
       <p class="page-num">Section 4 of 12</p>
       <h1>Mouth and Yawning Detection</h1>
-      <p class="lead">A yawn is a slower, larger signal than a blink, which makes it a useful second opinion.</p>
+      <p class="lead">A yawn is a slower, larger signal than a blink, which makes it a useful second opinion when deciding whether a driver is drowsy.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/04-yawning.mp3">Your browser does not support audio playback.</audio>
       </div>
+
+      <p>Frequent yawning is one of the classic warning signs of drowsy driving <a class="cite" href="bibliography.html#ref1">[1]</a>. It usually shows up at the drowsy stage, before the long eye closures of Section 3, and it remains visible even when the eyes are hard to measure, for example behind tinted glasses. The good news: detecting a yawn reuses exactly the same idea as EAR, applied to the mouth.</p>
+
       <h2>Mouth detection using facial landmarks</h2>
-      <p class="todo">Identify the lip landmarks: points 49 to 68 in the 68-point model, or 61, 65, 63, 67, 64, 66 in MediaPipe <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+      <p>Both landmark models from Section 2 trace the lips in detail. In Dlib's 68-point layout, points 49 to 60 follow the <strong>outer</strong> edge of the lips and points 61 to 68 follow the <strong>inner</strong> edge, where the lips meet (indices 48 to 67 in Python). MediaPipe's 468-point mesh covers the same contours with many more points.</p>
+      <p>For yawning, the <strong>inner</strong> lip points matter most. The outer edge changes with lip thickness and smiling, but the gap between the inner lips directly measures how wide the mouth is open. A yawn opens that gap far wider than speech does.</p>
+
+      <h2>Detecting a yawn with the Mouth Aspect Ratio</h2>
+      <p>The <strong>Mouth Aspect Ratio (MAR)</strong> has the same structure as EAR. Six inner-lip points are used: p1 and p4 at the corners of the mouth, p2 and p3 on the upper inner lip, and p6 and p5 directly below them on the lower inner lip.</p>
+      <div class="formula">MAR = ( ‖p2 − p6‖ + ‖p3 − p5‖ ) / ( 2 · ‖p1 − p4‖ )</div>
+      <p>Everything learned about EAR carries over: the numerator measures vertical opening at two places, the denominator measures width, and the ratio doesn't change with distance from the camera. The difference is direction. EAR <em>falls</em> when the eye closes; MAR <em>rises</em> when the mouth opens. Some systems use three vertical pairs instead of two (eight points, divided by 3 times the width), which smooths out landmark noise a little.</p>
+
       <figure>
-        <div class="fig-placeholder">Figure 5 goes here: Mouth landmarks on a closed mouth versus a yawn<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 5. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
+        <div class="table-wrap"><svg class="plot" viewBox="0 0 480 190" role="img" aria-labelledby="fig5-title" style="min-width:420px">
+<title id="fig5-title">Inner-lip landmarks on a closed mouth (MAR about 0.03) and during a yawn (MAR about 0.87)</title>
+<rect width="480" height="190" fill="#fff"/>
+<path d="M50 80 Q110 52 170 80 Q110 104 50 80 Z" fill="#C9737A"/>
+<path d="M76 80 Q110 77 144 80 Q110 83 76 80 Z" fill="#3A1F24"/>
+<line x1="93" x2="93" y1="79.0" y2="81.0" stroke="#E9A23B" stroke-dasharray="3 2"/>
+<line x1="127" x2="127" y1="79.0" y2="81.0" stroke="#E9A23B" stroke-dasharray="3 2"/>
+<line x1="76" x2="144" y1="80" y2="80" stroke="#91A2B5" stroke-dasharray="3 3"/>
+<circle cx="76.0" cy="80.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="93.0" cy="79.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="127.0" cy="79.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="144.0" cy="80.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="127.0" cy="81.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="93.0" cy="81.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<ellipse cx="350" cy="80" rx="48" ry="50" fill="#C9737A"/>
+<ellipse cx="350" cy="80" rx="34" ry="34" fill="#3A1F24"/>
+<line x1="333" x2="333" y1="50.6" y2="109.4" stroke="#E9A23B" stroke-dasharray="3 2"/>
+<line x1="367" x2="367" y1="50.6" y2="109.4" stroke="#E9A23B" stroke-dasharray="3 2"/>
+<line x1="316" x2="384" y1="80" y2="80" stroke="#91A2B5" stroke-dasharray="3 3"/>
+<circle cx="316.0" cy="80.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="333.0" cy="50.6" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="367.0" cy="50.6" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="384.0" cy="80.0" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="367.0" cy="109.4" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<circle cx="333.0" cy="109.4" r="4" fill="#E9A23B" stroke="#16212F" stroke-width="1"/>
+<g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="13" fill="#1B2530" text-anchor="middle">
+<text x="110" y="160" font-weight="700">Closed mouth</text><text x="110" y="177" fill="#566476">MAR ≈ 0.03</text>
+<text x="350" y="160" font-weight="700">Yawn</text><text x="350" y="177" fill="#566476">MAR ≈ 0.87</text>
+</g></svg></div>
+        <figcaption>Figure 5. The six inner-lip landmarks used for MAR on a closed mouth and during a yawn. The values are computed from the point positions in the drawing. Diagram created by the author.</figcaption>
       </figure>
-      <h2>Detecting a yawn</h2>
-      <p class="todo">Explain the Mouth Aspect Ratio (MAR) formula, its threshold, and the minimum duration that separates a yawn from talking or laughing. Report the 85.19% yawn-detection accuracy in <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+
+      <p>As with EAR, the exact numbers depend on which landmarks a system picks, so each system tunes its own threshold. With inner-lip points, a closed mouth gives a MAR near zero, normal speech produces brief values in the low tenths, and a full yawn pushes MAR well above 0.6. Those ranges are a starting point for calibration, not universal constants.</p>
+
+      <h2>Telling a yawn apart from talking and laughing</h2>
+      <p>A high MAR alone is not enough, because talking, singing, and laughing also open the mouth. Three properties separate a real yawn:</p>
+      <ul>
+        <li><strong>Height:</strong> a yawn opens the mouth much wider than speech, so MAR crosses a high threshold that talking rarely reaches.</li>
+        <li><strong>Duration:</strong> a yawn holds that wide opening for seconds, while a laugh or a loud word only peaks for a moment. Requiring MAR to stay above the threshold for a minimum time, such as 1.5 seconds, filters out most false yawns.</li>
+        <li><strong>Shape over time:</strong> a yawn rises slowly, holds, and falls slowly, while talking produces rapid, repeated small openings.</li>
+      </ul>
+      <p>Figure 6 shows how these rules play out on an illustrative 12-second MAR signal.</p>
+
+      <figure>
+        <div class="table-wrap"><svg class="plot" viewBox="0 0 700 270" role="img" aria-labelledby="fig6-title">
+<title id="fig6-title">MAR over twelve seconds: talking stays below the 0.6 threshold, a laugh crosses it for only 5 frames, and a yawn stays above it for 81 frames (2.7 seconds) and is counted.</title>
+<g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="12" fill="#566476">
+<rect x="429.6" y="40" width="140.1" height="186" fill="#FFF3DF"/>
+<line x1="52" x2="684" y1="226.0" y2="226.0" stroke="#E3E8ED"/>
+<text x="44" y="230.0" text-anchor="end">0.0</text>
+<line x1="52" x2="684" y1="188.8" y2="188.8" stroke="#E3E8ED"/>
+<text x="44" y="192.8" text-anchor="end">0.2</text>
+<line x1="52" x2="684" y1="151.6" y2="151.6" stroke="#E3E8ED"/>
+<text x="44" y="155.6" text-anchor="end">0.4</text>
+<line x1="52" x2="684" y1="114.4" y2="114.4" stroke="#E3E8ED"/>
+<text x="44" y="118.4" text-anchor="end">0.6</text>
+<line x1="52" x2="684" y1="77.2" y2="77.2" stroke="#E3E8ED"/>
+<text x="44" y="81.2" text-anchor="end">0.8</text>
+<line x1="52" x2="684" y1="40.0" y2="40.0" stroke="#E3E8ED"/>
+<text x="44" y="44.0" text-anchor="end">1.0</text>
+<text x="52.0" y="244" text-anchor="middle">0 s</text>
+<text x="157.3" y="244" text-anchor="middle">2 s</text>
+<text x="262.7" y="244" text-anchor="middle">4 s</text>
+<text x="368.0" y="244" text-anchor="middle">6 s</text>
+<text x="473.3" y="244" text-anchor="middle">8 s</text>
+<text x="578.7" y="244" text-anchor="middle">10 s</text>
+<text x="684.0" y="244" text-anchor="middle">12 s</text>
+<text x="368.0" y="264" text-anchor="middle">Time</text>
+<text x="14" y="133.0" text-anchor="middle" transform="rotate(-90 14 133.0)">MAR</text>
+<line x1="52" x2="684" y1="114.4" y2="114.4" stroke="#8A5A0E" stroke-dasharray="6 4" stroke-width="1.5"/>
+<text x="680" y="108.4" text-anchor="end" fill="#8A5A0E" font-weight="700">threshold 0.6</text>
+</g>
+<path d="M52.0 216.7 L53.8 216.3 L55.5 215.9 L57.3 215.5 L59.0 215.2 L60.8 215.0 L62.5 214.9 L64.3 214.8 L66.0 214.9 L67.8 215.1 L69.6 215.4 L71.3 215.7 L73.1 216.1 L74.8 216.6 L76.6 217.0 L78.3 217.4 L80.1 217.8 L81.8 218.1 L83.6 218.4 L85.4 218.5 L87.1 218.6 L88.9 218.5 L90.6 218.3 L92.4 218.1 L94.1 217.8 L95.9 217.4 L97.6 216.9 L99.4 216.5 L101.2 216.1 L102.9 215.7 L104.7 216.7 L106.4 207.6 L108.2 193.0 L109.9 178.5 L111.7 168.2 L113.4 164.6 L115.2 168.8 L117.0 179.5 L118.7 194.2 L120.5 208.7 L122.2 216.5 L124.0 206.6 L125.7 191.8 L127.5 177.5 L129.2 167.6 L131.0 164.7 L132.8 169.4 L134.5 180.6 L136.3 195.4 L138.0 209.7 L139.8 216.1 L141.5 205.5 L143.3 190.6 L145.0 176.5 L146.8 167.1 L148.6 164.8 L150.3 170.1 L152.1 181.7 L153.8 196.6 L155.6 210.6 L157.3 215.6 L159.1 204.4 L160.8 189.4 L162.6 175.5 L164.4 166.6 L166.1 164.9 L167.9 170.8 L169.6 182.8 L171.4 197.8 L173.1 211.5 L174.9 215.0 L176.6 203.3 L178.4 188.2 L180.2 174.6 L181.9 166.2 L183.7 165.1 L185.4 171.6 L187.2 183.9 L188.9 199.0 L190.7 212.4 L192.4 214.4 L194.2 202.1 L196.0 187.0 L197.7 173.7 L199.5 165.9 L201.2 165.4 L203.0 172.3 L204.7 185.1 L206.5 200.2 L208.2 213.2 L210.0 213.7 L211.8 201.0 L213.5 185.8 L215.3 172.9 L217.0 165.5 L218.8 165.7 L220.5 173.2 L222.3 218.2 L224.0 218.4 L225.8 218.5 L227.6 218.5 L229.3 218.5 L231.1 218.3 L232.8 218.0 L234.6 217.6 L236.3 217.2 L238.1 216.8 L239.8 216.3 L241.6 215.9 L243.4 215.6 L245.1 215.2 L246.9 215.0 L248.6 214.9 L250.4 214.8 L252.1 214.9 L253.9 215.1 L255.6 215.3 L257.4 215.7 L259.2 216.1 L260.9 216.5 L262.7 216.9 L264.4 217.4 L266.2 217.7 L267.9 218.1 L269.7 218.3 L271.4 218.5 L273.2 216.7 L275.0 207.0 L276.7 194.7 L278.5 181.5 L280.2 168.1 L282.0 155.2 L283.7 143.1 L285.5 132.2 L287.2 122.8 L289.0 115.2 L290.8 109.6 L292.5 106.2 L294.3 105.1 L296.0 106.2 L297.8 109.6 L299.5 115.2 L301.3 122.8 L303.0 132.2 L304.8 143.1 L306.6 155.2 L308.3 168.1 L310.1 181.5 L311.8 194.7 L313.6 207.0 L315.3 216.7 L317.1 218.4 L318.8 218.5 L320.6 218.6 L322.4 218.5 L324.1 218.3 L325.9 218.0 L327.6 217.7 L329.4 217.3 L331.1 216.8 L332.9 216.4 L334.6 216.0 L336.4 215.6 L338.2 215.3 L339.9 215.0 L341.7 214.9 L343.4 214.8 L345.2 214.9 L346.9 215.1 L348.7 215.3 L350.4 215.6 L352.2 216.0 L354.0 216.5 L355.7 216.9 L357.5 217.3 L359.2 217.7 L361.0 218.1 L362.7 218.3 L364.5 218.5 L366.2 218.6 L368.0 218.5 L369.8 218.4 L371.5 218.2 L373.3 217.9 L375.0 217.5 L376.8 217.1 L378.5 216.6 L380.3 216.2 L382.0 215.8 L383.8 215.4 L385.6 215.2 L387.3 215.0 L389.1 214.9 L390.8 214.9 L392.6 215.0 L394.3 216.7 L396.1 196.1 L397.8 186.6 L399.6 179.1 L401.4 172.7 L403.1 166.9 L404.9 161.7 L406.6 156.9 L408.4 152.4 L410.1 148.2 L411.9 144.2 L413.6 140.4 L415.4 136.8 L417.2 133.3 L418.9 130.0 L420.7 126.8 L422.4 123.7 L424.2 120.8 L425.9 117.9 L427.7 115.2 L429.4 112.5 L431.2 110.0 L433.0 107.5 L434.7 105.1 L436.5 102.8 L438.2 100.6 L440.0 98.5 L441.7 96.4 L443.5 94.4 L445.2 92.5 L447.0 90.6 L448.8 88.9 L450.5 87.2 L452.3 85.5 L454.0 83.9 L455.8 82.4 L457.5 81.0 L459.3 79.6 L461.0 78.2 L462.8 77.0 L464.6 75.8 L466.3 74.6 L468.1 73.6 L469.8 72.5 L471.6 71.6 L473.3 70.7 L475.1 69.8 L476.8 69.1 L478.6 68.3 L480.4 67.7 L482.1 67.1 L483.9 66.5 L485.6 66.0 L487.4 65.6 L489.1 65.2 L490.9 64.9 L492.6 64.6 L494.4 64.4 L496.2 64.3 L497.9 64.2 L499.7 64.2 L501.4 64.2 L503.2 64.3 L504.9 64.4 L506.7 64.6 L508.4 64.9 L510.2 65.2 L512.0 65.6 L513.7 66.0 L515.5 66.5 L517.2 67.1 L519.0 67.7 L520.7 68.3 L522.5 69.1 L524.2 69.8 L526.0 70.7 L527.8 71.6 L529.5 72.5 L531.3 73.6 L533.0 74.6 L534.8 75.8 L536.5 77.0 L538.3 78.2 L540.0 79.6 L541.8 81.0 L543.6 82.4 L545.3 83.9 L547.1 85.5 L548.8 87.2 L550.6 88.9 L552.3 90.6 L554.1 92.5 L555.8 94.4 L557.6 96.4 L559.4 98.5 L561.1 100.6 L562.9 102.8 L564.6 105.1 L566.4 107.5 L568.1 110.0 L569.9 112.5 L571.6 115.2 L573.4 117.9 L575.2 120.8 L576.9 123.7 L578.7 126.8 L580.4 130.0 L582.2 133.3 L583.9 136.8 L585.7 140.4 L587.4 144.2 L589.2 148.2 L591.0 152.4 L592.7 156.9 L594.5 161.7 L596.2 166.9 L598.0 172.7 L599.7 179.1 L601.5 186.6 L603.2 196.1 L605.0 216.7 L606.8 217.8 L608.5 217.4 L610.3 217.0 L612.0 216.5 L613.8 216.1 L615.5 215.7 L617.3 215.4 L619.0 215.1 L620.8 214.9 L622.6 214.8 L624.3 214.9 L626.1 215.0 L627.8 215.2 L629.6 215.5 L631.3 215.9 L633.1 216.3 L634.8 216.8 L636.6 217.2 L638.4 217.6 L640.1 218.0 L641.9 218.2 L643.6 218.4 L645.4 218.5 L647.1 218.5 L648.9 218.4 L650.6 218.2 L652.4 218.0 L654.2 217.6 L655.9 217.2 L657.7 216.8 L659.4 216.3 L661.2 215.9 L662.9 215.5 L664.7 215.2 L666.4 215.0 L668.2 214.9 L670.0 214.8 L671.7 214.9 L673.5 215.1 L675.2 215.4 L677.0 215.7 L678.7 216.1 L680.5 216.5 L682.2 217.0 L684.0 217.4" fill="none" stroke="#2F6F8F" stroke-width="2.2" stroke-linejoin="round"/>
+<g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="12.5" fill="#1B2530" text-anchor="middle">
+<text x="162.6" y="20" font-weight="700">Talking</text><text x="162.6" y="34">never crosses</text>
+<text x="294.3" y="20" font-weight="700">Laugh</text><text x="294.3" y="34">5 frames: ignored</text>
+<text x="499.7" y="20" font-weight="700" fill="#8A5A0E">Yawn</text><text x="499.7" y="34" fill="#8A5A0E">81 frames (2.7 s): counted</text>
+</g></svg></div>
+        <figcaption>Figure 6. Illustrative MAR signal at 30 frames per second. Talking never reaches the 0.6 threshold, a laugh crosses it for only 5 frames and is ignored, and a yawn stays above it for 81 frames (2.7 seconds) and is counted. Synthetic data generated by the author.</figcaption>
+      </figure>
+
+      <p>In code, the yawn detector is a small state machine: it notes when MAR first goes above the threshold, and when MAR drops back down it checks how long the opening lasted.</p>
+      <pre><code>MAR_THRESHOLD = 0.6
+MIN_YAWN_FRAMES = 45            # 1.5 s at 30 fps
+open_frames = 0
+yawn_times = []                 # timestamps of counted yawns
+
+def update(mar, now):
+    global open_frames
+    if mar &gt; MAR_THRESHOLD:
+        open_frames += 1
+    else:
+        if open_frames &gt;= MIN_YAWN_FRAMES:
+            yawn_times.append(now)      # a real yawn just ended
+        open_frames = 0                 # too short: talking or laughing
+
+def yawns_in_last(seconds, now):
+    return sum(1 for t in yawn_times if now - t &lt;= seconds)</code></pre>
+
       <h2>Yawning as a sign of drowsiness</h2>
-      <p class="todo">Discuss yawn frequency as an indicator, and its weaknesses: yawns can happen when alert, be covered by a hand, or be only partial, which is why <a class="cite" href="bibliography.html#ref3">[3]</a> recommends tracking MAR over time rather than single frames.</p>
+      <p>A single yawn proves very little. People yawn when bored, when they see someone else yawn, or simply after waking up. What matters is <strong>frequency</strong>: several yawns in a short period suggest drowsiness is building. A typical design counts yawns over a sliding window, such as the last 10 minutes, and raises a "consider taking a break" warning when the count passes a limit chosen during testing.</p>
+      <p>Yawning also has practical weaknesses, which the 2026 study by Zambrano et al. ran into directly <a class="cite" href="bibliography.html#ref3">[3]</a>:</p>
+      <ul>
+        <li><strong>Covered mouths.</strong> When testing on a dataset of driver images, their yawn detection reached only 36.84% precision, largely because faces were partly covered, often by a hand raised to the mouth <a class="cite" href="bibliography.html#ref3">[3]</a>.</li>
+        <li><strong>Head position.</strong> Different natural head positions shifted the MAR measurements, reducing accuracy <a class="cite" href="bibliography.html#ref3">[3]</a>.</li>
+        <li><strong>Partial yawns.</strong> In live tests, participants asked to yawn often didn't open their mouths fully, producing only small MAR changes; the system still reached 85.19% accuracy, and the authors recommend tracking MAR trends over time, the duration above threshold, and yawn counts rather than single frames <a class="cite" href="bibliography.html#ref3">[3]</a>.</li>
+      </ul>
+      <p>Because of these weaknesses, yawning works best as a <strong>supporting</strong> signal. The eyes give the strongest evidence; yawns add confidence and fill the gap when the eyes can't be measured. Deep learning detectors can also learn yawning directly from images, alongside eye closure and head nodding <a class="cite" href="bibliography.html#ref6">[6]</a>, as Section 7 shows.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>MAR applies the EAR formula to the inner lips: it rises as the mouth opens.</li>
+          <li>Height alone isn't enough; requiring the opening to last about 1.5 seconds separates yawns from talking and laughing.</li>
+          <li>Yawn frequency over several minutes matters more than any single yawn.</li>
+          <li>Hands over the mouth, head position, and partial yawns limit accuracy, so yawning supports eye-based detection rather than replacing it.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
