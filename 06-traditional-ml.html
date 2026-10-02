@@ -16,21 +16,144 @@
     <article class="content">
       <p class="page-num">Section 6 of 12</p>
       <h1>Computer Vision and Machine Learning</h1>
-      <p class="lead">Before deep learning, systems combined hand-designed features with classic classifiers. Many real-time systems still do.</p>
+      <p class="lead">Sections 3 to 5 produced measurements. This page is about the decision: turning EAR, MAR, and head pose into "alert" or "drowsy," first with hand-written rules, then with classic machine learning.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/06-traditional-ml.mp3">Your browser does not support audio playback.</audio>
       </div>
-      <h2>Traditional computer vision methods</h2>
-      <p class="todo">Describe threshold-based rule systems: if EAR stays below the threshold for N consecutive frames, raise an alert. Use the EAR baseline in <a class="cite" href="bibliography.html#ref6">[6]</a> as a worked example, including its measured precision.</p>
-      <figure>
-        <div class="fig-placeholder">Figure 8 goes here: Pipeline diagram: frame, landmarks, features, classifier, alert<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 8. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
-      </figure>
+
+      <p>There are three broad ways to make the final decision. <strong>Rule-based</strong> systems use thresholds chosen by people. <strong>Feature-based machine learning</strong> keeps the hand-designed measurements but lets an algorithm learn how to combine them. <strong>Deep learning</strong>, covered in Section 7, learns everything directly from images. This page covers the first two, which are often called "traditional" approaches even though many production systems still rely on them.</p>
+
+      <h2>Traditional computer vision methods: rules and thresholds</h2>
+      <p>The simplest drowsiness detector is a set of if-then rules built on the measurements from earlier sections:</p>
+      <ul>
+        <li>If EAR stays below 0.20 for 15 consecutive frames → <strong>"wake up" alert</strong> (Section 3).</li>
+        <li>If PERCLOS over the last minute exceeds a set percentage → <strong>"take a break" warning</strong> (Section 3).</li>
+        <li>If three or more yawns occur in 10 minutes → <strong>"take a break" warning</strong> (Section 4).</li>
+        <li>If a nod is detected → <strong>"wake up" alert</strong> (Section 5).</li>
+      </ul>
+      <p>Real systems add two refinements. <strong>Grace periods</strong> require a condition to persist before acting, so a brief glitch doesn't trigger an alarm. <strong>Priorities</strong> decide what happens when several rules fire at once. Zambrano et al. combined fixed thresholds with grace periods and gave fatigue alerts priority over distraction alerts, choosing fixed values to keep the system fast and reproducible <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+      <p>How well does a pure threshold rule work? Herath et al. tested a classic EAR rule on real driver videos from the UTA Real-Life Drowsiness Dataset: it reached a precision of 0.812 and a recall of 0.82 <a class="cite" href="bibliography.html#ref6">[6]</a>. In other words, about one in five of its drowsy calls was wrong, and it missed about one in five drowsy cases. That is a useful baseline, and the gap is what machine learning tries to close.</p>
+
       <h2>Feature extraction and classification</h2>
-      <p class="todo">Describe the features used (blink duration, blink frequency, PERCLOS, MAR, head-movement statistics) and classifiers such as SVM, k-NN, and random forests <a class="cite" href="bibliography.html#ref2">[2]</a>.</p>
+      <p>Machine learning changes the question from "which threshold should I pick?" to "given many labeled examples, what combination of measurements best separates alert from drowsy?" The pipeline looks like this:</p>
+
+      <figure>
+        <div class="table-wrap"><svg class="pipeline" viewBox="0 0 760 200" role="img" aria-labelledby="fig8-title">
+  <title id="fig8-title">Feature-based pipeline: frames to landmarks, per-frame signals, features over a time window, classifier, alert level</title>
+  <defs><marker id="arr8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#566476"/></marker></defs>
+  <g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="14" fill="#1B2530" text-anchor="middle">
+    <rect x="5" y="40" width="115" height="120" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+    <text x="62" y="92" font-weight="700">Frames +</text><text x="62" y="110" font-weight="700">landmarks</text><text x="62" y="130" fill="#566476" font-size="12">Section 2</text>
+    <rect x="140" y="40" width="140" height="120" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+    <text x="210" y="66" font-weight="700">Per-frame signals</text>
+    <text x="210" y="92" fill="#566476" font-size="12.5">EAR</text><text x="210" y="112" fill="#566476" font-size="12.5">MAR</text><text x="210" y="132" fill="#566476" font-size="12.5">pitch, yaw</text>
+    <rect x="300" y="20" width="170" height="160" rx="10" fill="#fff" stroke="#E9A23B" stroke-width="2"/>
+    <text x="385" y="45" font-weight="700">Window features</text>
+    <text x="385" y="68" fill="#566476" font-size="12">e.g. last 60 seconds</text>
+    <text x="385" y="94" font-size="12.5">PERCLOS, blink rate</text><text x="385" y="114" font-size="12.5">mean blink duration</text>
+    <text x="385" y="134" font-size="12.5">yawn count</text><text x="385" y="154" font-size="12.5">nod count, pitch spread</text>
+    <rect x="490" y="55" width="125" height="90" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+    <text x="552" y="92" font-weight="700">Classifier</text><text x="552" y="112" fill="#566476" font-size="12">rules, SVM, k-NN,</text><text x="552" y="128" fill="#566476" font-size="12">random forest</text>
+    <rect x="635" y="55" width="120" height="90" rx="10" fill="#16212F"/>
+    <text x="695" y="90" font-weight="700" fill="#fff">Alert level</text><text x="695" y="110" fill="#91A2B5" font-size="12">alert / drowsy</text>
+  </g>
+  <g stroke="#566476" stroke-width="1.6" fill="none" marker-end="url(#arr8)">
+    <line x1="120" y1="100" x2="138" y2="100"/><line x1="280" y1="100" x2="298" y2="100"/>
+    <line x1="470" y1="100" x2="488" y2="100"/><line x1="615" y1="100" x2="633" y2="100"/>
+  </g>
+</svg>
+</div>
+        <figcaption>Figure 8. A feature-based drowsiness classifier. Per-frame signals are summarized into features over a time window, and a classifier maps those features to an alert level. Diagram created by the author.</figcaption>
+      </figure>
+
+      <h3>Step 1: summarize time windows into features</h3>
+      <p>A classifier doesn't look at single frames. It looks at a <strong>window</strong>, such as the last 60 seconds, and describes it with a <em>feature vector</em>: a short list of numbers that capture how the driver behaved during that window. Typical features include:</p>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Computed from</th><th>Drowsy drivers tend to show</th></tr></thead>
+        <tbody>
+          <tr><td>PERCLOS</td><td>EAR</td><td>Higher values</td></tr>
+          <tr><td>Blink rate (blinks per minute)</td><td>EAR dips</td><td>Changes from the driver's normal rate</td></tr>
+          <tr><td>Mean blink duration</td><td>EAR dips</td><td>Longer, slower blinks</td></tr>
+          <tr><td>Longest eye closure</td><td>EAR</td><td>Longer closures, up to microsleeps</td></tr>
+          <tr><td>Yawn count</td><td>MAR</td><td>More yawns</td></tr>
+          <tr><td>Nod count and pitch spread</td><td>Head pitch</td><td>More nods and more head movement</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Researchers summarize this family of choices as eye-based, mouth-based, and head-based behavioral features, often fed to classic classifiers <a class="cite" href="bibliography.html#ref2">[2]</a>.</p>
+
+      <h3>Step 2: label the windows</h3>
+      <p>To learn, the algorithm needs examples whose answer is known. Common labels come from asking drivers to rate their own sleepiness every few minutes on a standard scale such as the 9-point Karolinska Sleepiness Scale, or from expert observers rating recorded video. Labels can be binary (alert or drowsy) or graded (alert, moderately drowsy, very drowsy). Section 8 explains why good labels are hard to collect.</p>
+
+      <h3>Step 3: train a classifier</h3>
+      <p>Several classic algorithms work well on small feature vectors:</p>
+      <ul>
+        <li><strong>Support Vector Machine (SVM):</strong> finds the boundary that separates the two classes with the widest possible margin. With a <em>kernel</em>, the boundary can curve. SVMs work well with modest amounts of data.</li>
+        <li><strong>k-Nearest Neighbors (k-NN):</strong> stores every training window. To classify a new one, it finds the k most similar windows and takes a vote. Simple and easy to explain, but every feature must be scaled to a similar range, or the feature with the largest numbers dominates the distance.</li>
+        <li><strong>Random forest:</strong> trains many decision trees, each on a random slice of the data and features, and lets them vote. It handles mixed features well and reports which features mattered most.</li>
+      </ul>
+
+      <div class="knn-lab">
+        <h3>Try it: classify a driving window with k-NN</h3>
+        <p class="legend">Each dot is one 60-second window from a driver, described by two features.<i style="background:#2F6F8F"></i>Alert<i style="background:#C2413A"></i>Drowsy</p>
+        <svg id="knn-svg" viewBox="0 0 600 340" role="img" aria-label="Scatter plot of alert and drowsy windows by PERCLOS and mean blink duration. Click to add a new window and see its nearest neighbors vote."></svg>
+        <div class="row">
+          <span>Neighbors (k):</span>
+          <span id="knn-k" role="group" aria-label="Number of neighbors">
+            <button type="button" data-k="1" aria-pressed="false">1</button>
+            <button type="button" data-k="3" aria-pressed="true">3</button>
+            <button type="button" data-k="5" aria-pressed="false">5</button>
+            <button type="button" data-k="9" aria-pressed="false">9</button>
+          </span>
+        </div>
+        <div class="result" id="knn-result" aria-live="polite"></div>
+        <p class="legend">Data points are synthetic and generated for illustration. Try placing a window in the overlap between the clusters and changing k: with k = 1 the answer flips on a single neighbor, while larger k gives a steadier vote.</p>
+      </div>
+
+      <p>In practice, a few lines of Python with the scikit-learn library train and evaluate all three. Note the <code>GroupKFold</code> split, which keeps each driver's windows together so the model is always tested on people it has never seen (Section 8 explains why this matters):</p>
+      <pre><code>from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GroupKFold, cross_val_score
+
+# X: one row per window [perclos, blink_rate, blink_dur, max_closure, yawns, nods]
+# y: 0 = alert, 1 = drowsy;  groups: driver ID for each window
+models = {
+    "SVM": make_pipeline(StandardScaler(), SVC(kernel="rbf")),
+    "k-NN": make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=5)),
+    "Random forest": RandomForestClassifier(n_estimators=200),
+}
+for name, model in models.items():
+    scores = cross_val_score(model, X, y, groups=groups, cv=GroupKFold(n_splits=5), scoring="f1")
+    print(f"{name}: F1 = {scores.mean():.2f}")</code></pre>
+      <p><code>StandardScaler</code> rescales every feature to a similar range, which SVM and k-NN need; random forests don't, because each tree split looks at one feature at a time.</p>
+
       <h2>Advantages and limitations</h2>
-      <p class="todo">Cover interpretability, speed, and low data needs on the plus side. On the minus side, cover sensitivity to fixed thresholds, head pose, glasses, and lighting <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Advantages</th><th>Limitations</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Explainable:</strong> every decision traces back to a measurement anyone can understand, such as "PERCLOS was 22%."</td><td><strong>Only as good as the features:</strong> if a sign of drowsiness isn't in the feature list, the model can't learn it.</td></tr>
+          <tr><td><strong>Fast:</strong> runs easily in real time on a phone or small CPU.</td><td><strong>Inherits landmark errors:</strong> head pose, glasses, and lighting distort EAR and MAR, and fixed thresholds often need recalibration per driver <a class="cite" href="bibliography.html#ref6">[6]</a>.</td></tr>
+          <tr><td><strong>Data-efficient:</strong> works with hundreds of labeled windows instead of the many thousands of images deep learning needs.</td><td><strong>Individual differences:</strong> one driver's normal is another's drowsy, as the small-eyes problem showed <a class="cite" href="bibliography.html#ref3">[3]</a>.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>When to choose this approach:</strong> when the system must run on modest hardware, when decisions need to be explainable (for example, to justify an alert to a fleet operator), or when only a small labeled dataset is available. When accuracy matters most and data and computing power are plentiful, deep learning is usually stronger, as the next section shows.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Rule-based systems combine thresholds, grace periods, and priorities; a plain EAR rule reached about 0.81 precision and 0.82 recall on real driver video.</li>
+          <li>Feature-based machine learning summarizes time windows into features such as PERCLOS, blink duration, yawns, and nods, then learns how to combine them.</li>
+          <li>SVM, k-NN, and random forests all work well on small feature vectors; scale features for SVM and k-NN.</li>
+          <li>Traditional methods are fast and explainable but can only learn from the features people design.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
@@ -38,5 +161,6 @@
   </main>
 </div>
 <script src="js/site.js"></script>
+<script src="js/knn-lab.js"></script>
 </body>
 </html>

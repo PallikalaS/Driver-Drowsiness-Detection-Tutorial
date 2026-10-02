@@ -244,3 +244,14 @@ figure img { border-radius: 10px; border: 1px solid var(--line); background: #ff
 .head-lab .verdict.warn { color: #FFB4AE; }
 .head-lab button { margin-top: .6rem; font: inherit; font-size: .9rem; background: transparent; color: #DCE4EC; border: 1px solid #3A4859; border-radius: 999px; padding: .3rem .8rem; cursor: pointer; }
 @media (max-width: 700px) { .head-lab { grid-template-columns: 1fr; } }
+
+/* ---------- k-NN lab (Section 6) ---------- */
+.knn-lab { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.2rem 1.2rem; margin: 1.6rem 0; }
+.knn-lab h3 { margin: 0 0 .4rem; }
+.knn-lab svg { width: 100%; display: block; cursor: crosshair; border-radius: 8px; background: var(--paper); touch-action: manipulation; }
+.knn-lab .row { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; align-items: center; margin-top: .7rem; }
+.knn-lab .row button { font: inherit; font-size: .92rem; padding: .3rem .8rem; border-radius: 999px; cursor: pointer; background: var(--paper); border: 1px solid var(--line); color: var(--ink); }
+.knn-lab .row button[aria-pressed="true"] { background: var(--night); border-color: var(--night); color: #fff; }
+.knn-lab .result { margin-top: .7rem; font-weight: 700; min-height: 1.6em; }
+.knn-lab .legend { font-size: .9rem; color: var(--muted); }
+.knn-lab .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 .3rem 0 .6rem; vertical-align: middle; }
