@@ -289,3 +289,23 @@ figure img { border-radius: 10px; border: 1px solid var(--line); background: #ff
 .cm { border-collapse: collapse; margin: 1rem 0; font-size: .97rem; }
 .cm th, .cm td { border: 1px solid var(--line); padding: .5rem .8rem; text-align: center; }
 .cm td.hit { background: #E5F3EA; } .cm td.miss { background: #FBE9E7; }
+
+/* ---------- timeline (Section 9) ---------- */
+.timeline { list-style: none; margin: 0; padding: 1rem 1.2rem; background: #fff; border: 1px solid var(--line); border-radius: 12px; position: relative; }
+.timeline li { display: grid; grid-template-columns: 3.6rem 1.4rem 1fr; gap: .5rem; align-items: start; padding: .45rem 0; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: calc(3.6rem + .5rem + .7rem - 1px); top: 0; bottom: 0; width: 2px; background: #AEB9C5; }
+.timeline li:first-child::before { top: 50%; } .timeline li:last-child::before { bottom: 50%; }
+.timeline .yr { font-family: var(--head); font-weight: 700; font-size: 1.1rem; color: var(--ink); text-align: right; line-height: 1.5; }
+.timeline .dot { width: 14px; height: 14px; border-radius: 50%; margin: .3rem auto 0; position: relative; z-index: 1; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); }
+.timeline .research .dot { background: var(--info); }
+.timeline .regulation .dot { background: var(--alert); }
+.timeline .what { font-size: .97rem; }
+.timeline .regulation .what strong { color: var(--alert); }
+.timeline-key { font-size: .88rem; color: var(--muted); margin: .4rem 0 0; }
+.timeline-key i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 .3rem 0 .8rem; vertical-align: middle; }
+.sys-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1.2rem; margin: 1.1rem 0; }
+.sys-card h3 { margin: 0 0 .3rem; }
+.sys-card .meta { font-size: .9rem; color: var(--muted); margin: 0 0 .5rem; }
+.sys-card dl { display: grid; grid-template-columns: 7rem 1fr; gap: .35rem .8rem; margin: 0; }
+.sys-card dt { font-weight: 700; } .sys-card dd { margin: 0; }
+@media (max-width: 640px) { .sys-card dl { grid-template-columns: 1fr; } }

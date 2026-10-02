@@ -16,21 +16,109 @@
     <article class="content">
       <p class="page-num">Section 9 of 12</p>
       <h1>Existing Systems</h1>
-      <p class="lead">Research prototypes and commercial products show what works today and where it breaks.</p>
+      <p class="lead">Research prototypes and production cars show what works today, and the published results show exactly where it still breaks.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/09-existing-systems.mp3">Your browser does not support audio playback.</audio>
       </div>
-      <h2>Examples of drowsiness detection systems</h2>
-      <p class="todo">Describe recent research systems, such as the MediaPipe-based monitor in <a class="cite" href="bibliography.html#ref3">[3]</a> and the YOLO-based detectors in <a class="cite" href="bibliography.html#ref6">[6]</a>, and the commercial driver monitoring systems discussed in <a class="cite" href="bibliography.html#ref2">[2]</a>.</p>
+
+      <p>Camera-based drowsiness detection has moved quickly from lab experiments to legal requirement. In the European Union, every new car must now include a system that warns drowsy drivers, and a camera-based distraction warning became mandatory for all new vehicles in July 2026 <a class="cite" href="bibliography.html#ref12">[12]</a>. This page looks at four research systems in detail, then at production systems, and closes with what the successes and failures have in common.</p>
+
       <figure>
-        <div class="fig-placeholder">Figure 11 goes here: Screenshot or diagram of an existing system's interface or hardware<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 11. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
+        <ol class="timeline">
+          <li class="research"><span class="yr">2016</span><span class="dot"></span><span class="what"><strong>Eye Aspect Ratio</strong> introduced for real-time blink detection <a class="cite" href="bibliography.html#ref4">[4]</a>; the <strong>NTHU-DDD</strong> benchmark released <a class="cite" href="bibliography.html#ref11">[11]</a>.</span></li>
+          <li class="research"><span class="yr">2019</span><span class="dot"></span><span class="what"><strong>UTA-RLDD</strong>: the first large dataset of real, not acted, drowsiness <a class="cite" href="bibliography.html#ref10">[10]</a>.</span></li>
+          <li class="regulation"><span class="yr">2022</span><span class="dot"></span><span class="what"><strong>EU requires drowsiness warning</strong> in new vehicle types <a class="cite" href="bibliography.html#ref12">[12]</a>.</span></li>
+          <li class="research"><span class="yr">2023</span><span class="dot"></span><span class="what">Landmark + CNN system detects <strong>blinks and yawns</strong> in real time <a class="cite" href="bibliography.html#ref8">[8]</a>.</span></li>
+          <li class="regulation"><span class="yr">2024</span><span class="dot"></span><span class="what"><strong>Drowsiness warning required in all new EU vehicles</strong>; distraction warning required in new types <a class="cite" href="bibliography.html#ref12">[12]</a>.</span></li>
+          <li class="research"><span class="yr">2025</span><span class="dot"></span><span class="what"><strong>YOLOv5–v11</strong> compared against EAR <a class="cite" href="bibliography.html#ref6">[6]</a>; <strong>3D Eyelid Angle</strong> proposed <a class="cite" href="bibliography.html#ref7">[7]</a>.</span></li>
+          <li class="research"><span class="yr">2026</span><span class="dot"></span><span class="what"><strong>MediaPipe-based monitor</strong> tested with 27 drivers <a class="cite" href="bibliography.html#ref3">[3]</a>.</span></li>
+          <li class="regulation"><span class="yr">2026</span><span class="dot"></span><span class="what"><strong>Distraction warning required in all new EU vehicles</strong> <a class="cite" href="bibliography.html#ref12">[12]</a>.</span></li>
+        </ol>
+        <p class="timeline-key">Key:<i style="background:#2F6F8F"></i>Research<i style="background:#C2413A"></i>Regulation</p>
+        <figcaption>Figure 11. Milestones in vision-based driver monitoring, 2016 to 2026, drawn from the references cited. Created by the author.</figcaption>
       </figure>
+
+      <h2>Examples of drowsiness detection systems</h2>
+
+      <div class="sys-card">
+        <h3>1. MediaPipe driver monitor (Zambrano et al., 2026)</h3>
+        <p class="meta">Landmarks + rules, with a CNN for emotions · Ordinary USB webcam · Tested with 27 drivers <a class="cite" href="bibliography.html#ref3">[3]</a></p>
+        <dl>
+          <dt>How it works</dt><dd>MediaPipe's 468 landmarks feed EAR, MAR, head pose, and gaze measurements, combined with fixed thresholds and grace periods; a MobileNetV2 network recognizes emotions alongside <a class="cite" href="bibliography.html#ref3">[3]</a>.</dd>
+          <dt>Results</dt><dd>88.89% accuracy for eye closure and 85.19% for yawning in live tests; every deliberate look away from the road was detected <a class="cite" href="bibliography.html#ref3">[3]</a>.</dd>
+          <dt>Where it failed</dt><dd>Drivers with naturally smaller eyes were flagged as drowsy while alert; a hand over the mouth cut yawn precision to 36.84% on an image dataset; normal forward posture was recognized only 74.07% of the time because head-pose thresholds didn't fit every face and seating position <a class="cite" href="bibliography.html#ref3">[3]</a>.</dd>
+        </dl>
+      </div>
+
+      <div class="sys-card">
+        <h3>2. YOLO detectors (Herath et al., 2025)</h3>
+        <p class="meta">Whole-face deep learning · UTA-RLDD subset of 18 participants <a class="cite" href="bibliography.html#ref6">[6]</a></p>
+        <dl>
+          <dt>How it works</dt><dd>Seven YOLO versions trained to draw a box around the face labeled awake or drowsy, compared against a classic EAR rule <a class="cite" href="bibliography.html#ref6">[6]</a>.</dd>
+          <dt>Results</dt><dd>YOLOv9c reached the highest mAP@0.5 (0.986); the small YOLOv11n came close (0.981) and suits embedded devices; the EAR rule reached 0.812 precision <a class="cite" href="bibliography.html#ref6">[6]</a>.</dd>
+          <dt>Where it failed</dt><dd>EAR struggled with head pose, glasses, and lighting <a class="cite" href="bibliography.html#ref6">[6]</a>. The YOLO results come from a random frame split of one dataset and weren't tested in a car, so performance on new drivers is unknown (Section 8).</dd>
+        </dl>
+      </div>
+
+      <div class="sys-card">
+        <h3>3. Landmark + CNN blink and yawn detector (Safarov et al., 2023)</h3>
+        <p class="meta">Hybrid: landmark tracking with deep learning <a class="cite" href="bibliography.html#ref8">[8]</a></p>
+        <dl>
+          <dt>How it works</dt><dd>Facial landmark tracking combined with a CNN to detect blinking and yawning in real time <a class="cite" href="bibliography.html#ref8">[8]</a>.</dd>
+          <dt>Results</dt><dd>Reported at 95.8% accuracy for eye-based fatigue detection <a class="cite" href="bibliography.html#ref3">[3]</a>.</dd>
+          <dt>Where it failed</dt><dd class="todo">Add the limitations the authors report after skimming the paper.</dd>
+        </dl>
+      </div>
+
+      <div class="sys-card">
+        <h3>4. Blink-sequence model for early drowsiness (Ghoddoosian et al., 2019)</h3>
+        <p class="meta">Temporal model on blink features · UTA-RLDD, 60 participants <a class="cite" href="bibliography.html#ref10">[10]</a></p>
+        <dl>
+          <dt>How it works</dt><dd>Extracts blink features over time and feeds the sequence to a temporal model, aiming to catch subtle, early drowsiness instead of only obvious cases <a class="cite" href="bibliography.html#ref10">[10]</a>.</dd>
+          <dt>Results</dt><dd>Beat the accuracy of human observers, who themselves judged the videos correctly less than 60% of the time <a class="cite" href="bibliography.html#ref10">[10]</a>.</dd>
+          <dt>Where it failed</dt><dd>Early drowsiness is genuinely hard: the three-way split between alert, low vigilance, and drowsy remains difficult even for people <a class="cite" href="bibliography.html#ref10">[10]</a>.</dd>
+        </dl>
+      </div>
+
+      <h3>Production systems in cars</h3>
+      <p>Commercial <strong>driver monitoring systems (DMS)</strong> have been available on some cars for several years, often paired with hands-free highway driving features that need to confirm the driver is watching the road. They follow the same pipeline as this tutorial but with automotive hardware: a near-infrared camera mounted on the steering column or dashboard, infrared lighting so it works in darkness and through many sunglasses, and software that tracks the eyes, gaze, and head.</p>
+      <p>Regulation is now driving adoption. The EU defines a <strong>Driver Drowsiness and Attention Warning (DDAW)</strong> system as one that assesses the driver's alertness and warns them through the vehicle's displays or sounds when needed. It became mandatory for new vehicle types in July 2022 and for all new vehicles in July 2024, and the technical rules allow it to warn at level 7 of the Karolinska Sleepiness Scale, the same scale used to label training data in Section 6 <a class="cite" href="bibliography.html#ref12">[12]</a>. A separate <strong>Advanced Driver Distraction Warning (ADDW)</strong> became mandatory for new types in July 2024 and for all new vehicles in July 2026 <a class="cite" href="bibliography.html#ref12">[12]</a>. Because ADDW is defined around where the driver is looking, it effectively requires a driver-facing camera, which puts the eye and head tracking hardware from this tutorial into every new car sold in the EU.</p>
+
       <h2>Successful approaches</h2>
-      <p class="todo">Summarize each system's reported results and what made it work.</p>
+      <p>Looking across these systems, five design choices keep showing up in the ones that work:</p>
+      <ol>
+        <li><strong>Fast landmark geometry for the per-frame measurements.</strong> EAR, MAR, and head pose run in real time on ordinary hardware and are easy to explain <a class="cite" href="bibliography.html#ref3">[3]</a>.</li>
+        <li><strong>Time, not single frames.</strong> Consecutive-frame counters, PERCLOS, and temporal models all beat one-frame decisions; the blink-sequence model above outperformed human observers <a class="cite" href="bibliography.html#ref10">[10]</a>.</li>
+        <li><strong>Several cues together.</strong> Eyes, mouth, and head pose cover for each other when one is hidden <a class="cite" href="bibliography.html#ref3">[3]</a>.</li>
+        <li><strong>Small, efficient networks</strong> where deep learning is used, such as YOLOv11n or MobileNetV2, so the system still runs on a phone or in-car computer <a class="cite" href="bibliography.html#ref6">[6]</a>.</li>
+        <li><strong>Infrared cameras</strong> in production systems, which remove most lighting problems before the software even starts.</li>
+      </ol>
+
       <h2>Limitations of existing systems</h2>
-      <p class="todo">Explain where and why each system failed, according to its authors.</p>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Failure</th><th>Seen in</th><th>Root cause</th><th>Direction for a fix</th></tr></thead>
+        <tbody>
+          <tr><td>False drowsiness alerts for some alert drivers</td><td><a class="cite" href="bibliography.html#ref3">[3]</a></td><td>One fixed EAR threshold for every face</td><td>Calibrate to each driver's baseline</td></tr>
+          <tr><td>Missed or false yawns</td><td><a class="cite" href="bibliography.html#ref3">[3]</a></td><td>Hands over the mouth, partial yawns</td><td>Track MAR over time; rely more on eyes</td></tr>
+          <tr><td>Errors when the head turns</td><td><a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref6">[6]</a></td><td>2D measurements change with viewing angle</td><td>Head-pose-aware or 3D measures <a class="cite" href="bibliography.html#ref7">[7]</a></td></tr>
+          <tr><td>Results that may not transfer</td><td><a class="cite" href="bibliography.html#ref6">[6]</a></td><td>Frame-level splits, single dataset, no in-car test</td><td>Subject-independent tests on real drives</td></tr>
+          <tr><td>Uncertain ground truth</td><td><a class="cite" href="bibliography.html#ref10">[10]</a></td><td>Drowsiness has no objective measurement</td><td>Combine self-ratings, observers, and sensors</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Almost every failure traces back to one of two causes: the real world is more varied than the training or tuning data, or the system judges one moment instead of a trend. Section 10 looks at those real-world challenges one by one.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Recent research systems reach roughly 85–95% on their own tests, using landmarks, CNNs, or both.</li>
+          <li>Their failures are consistent: fixed thresholds, covered faces, head turns, and test setups that don't match real driving.</li>
+          <li>In the EU, drowsiness warnings are required in all new vehicles, and camera-based distraction warnings joined them in July 2026.</li>
+          <li>Successful designs combine fast landmark measurements, reasoning over time, multiple cues, and infrared cameras.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
