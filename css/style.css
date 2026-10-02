@@ -325,3 +325,14 @@ figure img { border-radius: 10px; border: 1px solid var(--line); background: #ff
 details { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: .7rem 1rem; margin: 1.2rem 0; }
 details summary { cursor: pointer; }
 details pre { margin-bottom: 0; }
+
+/* ---------- labs (Section 12) ---------- */
+.labs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+.lab { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1.1rem; }
+.lab h3 { margin: 0 0 .15rem; font-size: 1.2rem; }
+.lab .where { font-size: .9rem; color: var(--muted); margin: 0 0 .5rem; }
+.lab p { margin: .3rem 0; font-size: .96rem; }
+.journey { counter-reset: j; list-style: none; padding: 0; }
+.journey li { counter-increment: j; padding-left: 2.4rem; position: relative; margin: .6rem 0; }
+.journey li::before { content: counter(j); position: absolute; left: 0; top: .05rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--night); color: var(--amber); font-family: var(--head); font-weight: 700; display: grid; place-items: center; font-size: .95rem; }
+@media (max-width: 700px) { .labs { grid-template-columns: 1fr; } }

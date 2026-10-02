@@ -16,21 +16,80 @@
     <article class="content">
       <p class="page-num">Section 12 of 12</p>
       <h1>Future Research and Conclusion</h1>
-      <p class="lead">Where the field is heading, who is leading it, and what to remember from this tutorial.</p>
+      <p class="lead">Where vision-based drowsiness detection is heading, who is leading the research, and what to take away from this tutorial.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/12-conclusion.mp3">Your browser does not support audio playback.</audio>
       </div>
+
       <h2>Improving detection in difficult conditions</h2>
-      <p class="todo">Cover infrared imaging, multimodal sensor fusion, personalization, and 3D eyelid metrics that stay stable when the camera angle changes <a class="cite" href="bibliography.html#ref7">[7]</a>.</p>
+      <p>Section 10 showed that most failures come from conditions the system wasn't built for. Current research attacks them from several directions:</p>
+      <ul>
+        <li><strong>Measurements that survive camera angles.</strong> The 2D Eye Aspect Ratio changes when the head turns. The Eyelid Angle computed from 3D landmarks stays much more stable across viewpoints <a class="cite" href="bibliography.html#ref7">[7]</a>, and the same work uses it to generate synthetic training data with realistic blinks <a class="cite" href="bibliography.html#ref7">[7]</a>, a way around the shortage of real drowsiness recordings.</li>
+        <li><strong>Personalization.</strong> Instead of one threshold for everyone, future systems will adapt to each driver, building on the per-driver calibration from Section 10 and the evidence that fixed thresholds fail for some faces <a class="cite" href="bibliography.html#ref3">[3]</a>.</li>
+        <li><strong>Catching drowsiness earlier.</strong> Most systems react to obvious signs such as long closures and nods. Detecting the subtle, early stage, before the driver is impaired, remains an open problem; even human observers struggle with it <a class="cite" href="bibliography.html#ref10">[10]</a>.</li>
+        <li><strong>Sensor fusion.</strong> Combining the camera with steering behavior, lane position, or wearable heart-rate sensors lets one source cover for another when, for example, sunglasses hide the eyes <a class="cite" href="bibliography.html#ref2">[2]</a>.</li>
+      </ul>
+
       <h2>Advances in deep learning</h2>
-      <p class="todo">Cover lightweight models for phones and embedded devices <a class="cite" href="bibliography.html#ref6">[6]</a>, transformers <a class="cite" href="bibliography.html#ref9">[9]</a>, and trends from the 2024 survey <a class="cite" href="bibliography.html#ref2">[2]</a>.</p>
+      <ul>
+        <li><strong>Small models for the edge.</strong> Compact networks such as nano-sized YOLO models now come close to the accuracy of much larger ones while running on embedded hardware <a class="cite" href="bibliography.html#ref6">[6]</a>, so capable detection can live inside a phone or an in-car computer instead of the cloud.</li>
+        <li><strong>Temporal and attention-based models.</strong> Since drowsiness unfolds over seconds, models that reason over sequences, including transformers, are an active direction <a class="cite" href="bibliography.html#ref9">[9]</a>.</li>
+        <li><strong>Better data.</strong> Synthetic data, real-life recordings like UTA-RLDD <a class="cite" href="bibliography.html#ref10">[10]</a>, and subject-independent evaluation (Section 8) are all needed before reported accuracy can be trusted on new drivers.</li>
+      </ul>
+
       <h2>Research labs working in this area</h2>
-      <p class="todo">List the labs you contacted, what each is working on now, and any replies you received. The Fraunhofer group behind the 2024 survey is a good example.</p>
+      <p>Several research groups behind the work in this tutorial continue to push the field forward:</p>
+      <div class="labs">
+        <div class="lab">
+          <h3>LISA, UC San Diego</h3>
+          <p class="where">Laboratory for Intelligent and Safe Automobiles · Director: Prof. Mohan Trivedi</p>
+          <p>A long-running driver-safety lab that studies the driver together with the car's surroundings, including driver attention, head dynamics, and predicting driver maneuvers. With Toyota's Collaborative Safety Research Center, it has worked on models for handing control back and forth between an automated car and its driver <a class="cite" href="bibliography.html#ref13">[13]</a>, where knowing whether the driver is alert is essential.</p>
+        </div>
+        <div class="lab">
+          <h3>Fraunhofer IGD, Germany</h3>
+          <p class="where">Fraunhofer Institute for Computer Graphics Research · Authors of the 2024 survey <a class="cite" href="bibliography.html#ref2">[2]</a></p>
+          <p>Researchers here, including Naser Damer and Fadi Boutros, co-authored the 2024 IEEE survey of drowsiness detection methods, difficulties, and recent developments used throughout this tutorial <a class="cite" href="bibliography.html#ref2">[2]</a>.</p>
+        </div>
+        <div class="lab">
+          <h3>University of Texas at Arlington</h3>
+          <p class="where">Prof. Vassilis Athitsos · Creators of UTA-RLDD <a class="cite" href="bibliography.html#ref10">[10]</a></p>
+          <p>Built the largest public dataset of real, not acted, drowsiness and a temporal model based on blink sequences, aimed at catching drowsiness at its early stage <a class="cite" href="bibliography.html#ref10">[10]</a>.</p>
+        </div>
+        <div class="lab">
+          <h3>NTHU Computer Vision Lab, Taiwan</h3>
+          <p class="where">National Tsing Hua University · Prof. Shang-Hong Lai · Creators of NTHU-DDD <a class="cite" href="bibliography.html#ref11">[11]</a></p>
+          <p>Created the NTHU-DDD benchmark with its controlled glasses, sunglasses, and night scenarios <a class="cite" href="bibliography.html#ref11">[11]</a>, still one of the most widely used datasets for comparing drowsiness detectors.</p>
+        </div>
+      </div>
+      <p class="todo">Add a sentence or two on which of these labs you contacted, when, and any replies about what they are working on now.</p>
+
       <h2>Future driver monitoring systems</h2>
-      <p class="todo">Discuss regulation (for example, EU rules requiring driver drowsiness warning systems in new vehicles) and the role of monitoring in semi-autonomous cars.</p>
+      <p>Regulation has turned driver monitoring from an optional extra into standard equipment. In the European Union, every new vehicle must now carry a drowsiness and attention warning system, and since July 2026 an advanced distraction warning as well <a class="cite" href="bibliography.html#ref12">[12]</a>. Because the distraction warning depends on where the driver is looking, driver-facing cameras are becoming a normal part of new cars.</p>
+      <p>Two trends will shape what comes next. First, as cars take over more of the driving, monitoring shifts from "is the driver drowsy?" to "is the driver ready to take back control?", the question labs like LISA study <a class="cite" href="bibliography.html#ref13">[13]</a>. Second, a camera pointed at a driver's face raises privacy concerns. The approach this tutorial describes fits well with privacy-friendly design: landmarks and measurements can be computed on the device, and only the alert, never the video, needs to leave it.</p>
+
       <h2>Conclusion</h2>
-      <p class="todo">Summarize the key takeaways in 4 or 5 sentences, then point readers to the quiz.</p>
+      <p>This tutorial followed one idea from start to finish: a tired driver's face changes before the car does, and a camera can measure those changes.</p>
+      <ol class="journey">
+        <li>Drowsy driving is far more common and deadly than official crash counts suggest, and drivers can't reliably judge their own sleepiness (Section 1).</li>
+        <li>A camera, a face detector, and a landmark model turn each video frame into precise, numbered facial points (Section 2).</li>
+        <li>Simple geometry turns those points into meaningful signals: EAR and PERCLOS for the eyes, MAR for yawns, and pitch for nodding (Sections 3 to 5).</li>
+        <li>Rules, classic classifiers, and deep networks turn the signals into decisions, each with its own balance of speed, accuracy, and explainability (Sections 6 and 7).</li>
+        <li>Honest evaluation needs realistic data and subject-independent testing, and published systems show both real progress and consistent failures (Sections 8 and 9).</li>
+        <li>The hardest problems are lighting, eyewear, differences between people, and false alarms, and per-driver calibration addresses the most common one (Sections 10 and 11).</li>
+      </ol>
+      <p>The building blocks are mature enough to run on an ordinary webcam, and regulation is putting driver monitoring into every new car in Europe. The open challenges, catching drowsiness early, working for every driver in every condition, and earning drivers' trust, are where the next few years of research will focus.</p>
+      <p><strong>Ready to check what you've learned?</strong> Try the <a href="quiz.html">quiz</a>.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Future work targets viewpoint-stable 3D measures, personalization, early detection, and sensor fusion.</li>
+          <li>Small, temporal deep learning models and better data are making accurate detection practical on everyday hardware.</li>
+          <li>Driver monitoring is becoming standard equipment, and is shifting toward judging readiness to take control.</li>
+          <li>Measuring the face over time, calibrated to each driver, is the core idea behind every system in this tutorial.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
