@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Driver Drowsiness Detection: A Computer Vision Tutorial</title>
+  <meta name="description" content="A tutorial on detecting driver drowsiness from camera video using eye, mouth, and head-pose analysis.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Semi+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar"><a class="brand" href="index.html">Driver Drowsiness Detection</a></aside>
+
+  <main>
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <p class="byline">Swathi Pallikala</p>
+          <h1>Detecting driver drowsiness with computer vision</h1>
+          <p>A tired driver's face changes before the car does. Eyes stay closed longer, yawns come more often, and the head starts to nod. This tutorial shows how a camera and a few well-chosen measurements can catch those signs in real time.</p>
+          <a class="btn" href="01-introduction.html">Start the tutorial</a>
+        </div>
+
+        <div class="eye-panel">
+          <svg id="eye-demo" viewBox="0 0 240 120" role="img"
+               aria-label="Animated eye with six landmarks. The eye aspect ratio drops toward zero as the eyelids close.">
+            <defs>
+              <clipPath id="eyeclip"><path d="M20 60 Q120 -5 220 60 Q120 125 20 60 Z"/></clipPath>
+            </defs>
+            <g clip-path="url(#eyeclip)">
+              <rect x="0" y="0" width="240" height="120" fill="#EEF2F6"/>
+              <circle cx="120" cy="60" r="26" fill="#3E7896"/>
+              <circle cx="120" cy="60" r="11" fill="#0F1822"/>
+              <circle cx="128" cy="52" r="4" fill="#FFFFFF" opacity=".85"/>
+              <path id="lid-up" d="" fill="#33465B"/>
+              <path id="lid-low" d="" fill="#33465B"/>
+              <path id="edge-up" d="" fill="none" stroke="#E9A23B" stroke-width="1.5"/>
+              <path id="edge-low" d="" fill="none" stroke="#E9A23B" stroke-width="1.5"/>
+            </g>
+            <path d="M20 60 Q120 -5 220 60 Q120 125 20 60 Z" fill="none" stroke="#7F90A4" stroke-width="1.2"/>
+            <line x1="20" y1="60" x2="220" y2="60" stroke="#91A2B5" stroke-width="1" stroke-dasharray="3 3"/>
+            <line id="v1" x1="85" x2="85" y1="30" y2="90" stroke="#E9A23B" stroke-width="1" stroke-dasharray="3 3"/>
+            <line id="v2" x1="155" x2="155" y1="30" y2="90" stroke="#E9A23B" stroke-width="1" stroke-dasharray="3 3"/>
+            <g fill="#E9A23B" stroke="#16212F" stroke-width="1.2">
+              <circle id="p1" r="4.5" cx="20" cy="60"/><circle id="p2" r="4.5" cx="85" cy="30"/>
+              <circle id="p3" r="4.5" cx="155" cy="30"/><circle id="p4" r="4.5" cx="220" cy="60"/>
+              <circle id="p5" r="4.5" cx="155" cy="90"/><circle id="p6" r="4.5" cx="85" cy="90"/>
+            </g>
+          </svg>
+          <div class="readout" aria-live="off">
+            <div class="ear"><span id="ear-value">0.30</span><small>Eye aspect ratio</small></div>
+            <div class="closed" id="closed-time">Eyes open</div>
+            <div class="lamp" id="lamp"><i></i>Alert</div>
+          </div>
+          <p class="eye-caption">The six dots are eye landmarks. EAR compares the eye's height to its width, so it falls toward zero as the eye closes. Quick blinks dip briefly; a closure that stays below 0.20 for too long triggers the alert.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="content">
+      <div class="narration">
+        <span>Listen to this page</span>
+        <audio controls preload="none" src="audio/00-home.mp3">Your browser does not support audio playback.</audio>
+      </div>
+
+      <h2>What this tutorial covers</h2>
+      <p>Driver drowsiness is a major road-safety problem because fatigue slows a driver's attention and reaction time. This tutorial explores how computer vision can detect it by analyzing the driver's face in camera video. It focuses on visual signs such as eye closure, blinking patterns, yawning, and head movement, and on the techniques used to measure them, including facial landmark detection, the Eye Aspect Ratio (EAR), and PERCLOS.</p>
+      <p>It also compares traditional computer vision, machine learning, and deep learning approaches, and looks honestly at where existing systems succeed and fail: poor lighting, sunglasses, unusual camera angles, differences between drivers, and false alarms.</p>
+
+      <div class="facts">
+        <div><strong>15 to 30 minutes</strong>Time to complete the tutorial</div>
+        <div><strong>Narrated pages</strong>Press play at the top of any page</div>
+        <div><strong>Quiz at the end</strong>Check what you've learned</div>
+      </div>
+
+      <h2>Sections</h2>
+      <ol class="toc-list">
+        <li><a href="01-introduction.html">Introduction and Problem Definition</a></li>
+        <li><a href="02-face-detection.html">Detecting the Driver's Face</a></li>
+        <li><a href="03-eye-detection.html">Eye-Based Drowsiness Detection</a></li>
+        <li><a href="04-yawning.html">Mouth and Yawning Detection</a></li>
+        <li><a href="05-head-pose.html">Head-Pose Analysis</a></li>
+        <li><a href="06-traditional-ml.html">Computer Vision and Machine Learning</a></li>
+        <li><a href="07-deep-learning.html">Deep Learning Approaches</a></li>
+        <li><a href="08-datasets.html">Datasets and Evaluation</a></li>
+        <li><a href="09-existing-systems.html">Existing Systems</a></li>
+        <li><a href="10-challenges.html">Real-World Challenges</a></li>
+        <li><a href="11-demo.html">Experimental Demonstration</a></li>
+        <li><a href="12-conclusion.html">Future Research and Conclusion</a></li>
+      </ol>
+      <p>Then test yourself with the <a href="quiz.html">quiz</a>. Every numbered citation links to the <a href="bibliography.html">annotated bibliography</a>.</p>
+
+      <nav class="pager" aria-label="Page navigation"></nav>
+      <footer class="site-footer"></footer>
+    </div>
+  </main>
+</div>
+<script src="js/site.js"></script>
+</body>
+</html>
