@@ -21,20 +21,131 @@
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/02-face-detection.mp3">Your browser does not support audio playback.</audio>
       </div>
+
+      <p>Before a system can measure an eye or a yawn, it has to answer two simpler questions for every frame: <em>where is the face?</em> and <em>where exactly are the eyes, nose, and mouth inside it?</em> This page covers the camera that captures the frames, the detector that finds the face, and the landmark model that pinpoints its features.</p>
+
       <h2>Capturing the driver's face</h2>
-      <p class="todo">Cover camera placement (dashboard, steering column, A-pillar), RGB vs. near-infrared cameras, frame rate, and resolution.</p>
-      <figure>
-        <div class="fig-placeholder">Figure 2 goes here: Face detection bounding box on a driver image<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 2. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
-      </figure>
+      <h3>Camera placement</h3>
+      <p>Where the camera sits decides what it can see. A camera on the <strong>steering column</strong> gets a nearly frontal view, but the wheel's spokes can block the face during turns. A camera near the <strong>rear-view mirror</strong> or the <strong>A-pillar</strong> stays clear of the wheel but sees the face from an angle. A <strong>phone on a dashboard mount</strong> is the cheapest option and works well when it faces the driver straight on. Viewing angle matters more than it seems: eye measurements like the Eye Aspect Ratio change when the face is seen from the side, a problem Section 10 returns to.</p>
+
+      <h3>Visible light vs. near-infrared</h3>
+      <p>An ordinary <strong>RGB camera</strong>, like a webcam or phone camera, sees what we see, so it struggles at night and in harsh sunlight. Production driver monitoring systems usually use <strong>near-infrared (NIR) cameras</strong> with their own small infrared LEDs. The driver can't see the light, but the camera gets an evenly lit grayscale image in complete darkness, and infrared often passes through sunglass lenses that block visible light. For a phone-based or webcam prototype, RGB is the practical choice, as long as the cabin has some light.</p>
+
+      <h3>Frame rate and resolution</h3>
+      <p>Frame rate decides whether quick events are caught at all. A normal blink lasts roughly 100 to 400 milliseconds. At 30 frames per second, that blink spans about 3 to 12 frames, enough to see it close and reopen. At 10 frames per second, a fast blink might fall into a single frame or be missed entirely. Resolution matters less: the face only needs enough pixels for the eye region to be clear. The 2026 system by Zambrano et al., for example, used an ordinary USB webcam at 640 × 480 pixels and 30 frames per second <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+
       <h2>Face detection</h2>
-      <p class="todo">Explain Haar cascades (Viola-Jones), HOG + linear SVM, and CNN-based detectors such as BlazeFace. Compare speed and accuracy, and say when each is a good choice.</p>
-      <figure>
-        <div class="fig-placeholder">Figure 3 goes here: Facial landmarks: the 68-point model next to the MediaPipe 468-point mesh<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 3. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
-      </figure>
+      <p>A face detector takes a whole frame and returns a rectangle (a <em>bounding box</em>) around each face. Three families of detectors dominate:</p>
+      <h3>Haar cascades (Viola-Jones)</h3>
+      <p>The classic method slides a small window across the image and asks a chain of very simple questions, such as "is the eye region darker than the cheeks below it?" Each question compares the brightness of neighboring rectangles, which an <em>integral image</em> makes extremely cheap to compute. The questions are arranged as a <em>cascade</em>: a window that fails an early, cheap test is thrown away immediately, so the detector spends almost no time on background. It is very fast, but it mostly finds upright, frontal faces and is easily fooled by shadows.</p>
+      <h3>HOG + linear SVM</h3>
+      <p>This method describes each image patch by its <em>Histogram of Oriented Gradients</em>: it divides the patch into small cells and records which directions the edges point in each cell. A face has a characteristic edge pattern (the curves of the eyes, the line of the nose), and a linear Support Vector Machine learns to recognize it. The popular Dlib library's default face detector works this way. It handles lighting changes better than Haar cascades but still prefers frontal faces.</p>
+      <h3>CNN-based detectors</h3>
+      <p>Modern detectors use convolutional neural networks that learn their own features from thousands of labeled faces. They cope much better with turned heads, partial occlusion, and dim light. Lightweight versions designed for phones, such as Google's BlazeFace, which powers MediaPipe's face pipeline, run in real time on a mobile device.</p>
+
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Detector</th><th>Speed on a CPU</th><th>Handles turned heads and poor light</th><th>Good choice when</th></tr></thead>
+        <tbody>
+          <tr><td>Haar cascade</td><td>Very fast</td><td>Poorly</td><td>Hardware is extremely limited and the face is always frontal</td></tr>
+          <tr><td>HOG + SVM</td><td>Fast</td><td>Moderately</td><td>You use Dlib's 68-point landmarks, which expect its boxes</td></tr>
+          <tr><td>CNN (e.g., BlazeFace)</td><td>Fast on mobile hardware</td><td>Well</td><td>Building a modern phone or in-car system</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>Practical tip:</strong> a driver's face barely moves between frames, so most real-time systems don't run the full detector on every frame. They detect the face once, then track it, re-running the detector only when tracking is lost. This saves a large share of the 33-millisecond frame budget from Section 1.</p>
+
       <h2>Facial landmark detection</h2>
-      <p class="todo">Compare Dlib's 68-point model with MediaPipe Face Mesh (468 points), which recent systems use <a class="cite" href="bibliography.html#ref3">[3]</a>. List which landmark indices belong to the eyes and mouth, since later pages rely on them (for MediaPipe, the eye points 33, 160, 158, 133, 153, 144 used in <a class="cite" href="bibliography.html#ref3">[3]</a>).</p>
+      <p>A bounding box says where the face is, but drowsiness measures need precise points: the corners of the eyes, the edges of the eyelids, the lips. A <strong>landmark model</strong> takes the face box and returns the coordinates of a fixed set of named points. The same point number always means the same place on every face, which is what makes measurements like EAR possible.</p>
+
+      <h3>Dlib's 68-point model</h3>
+      <p>The most widely taught layout uses 68 points, predicted by an <em>ensemble of regression trees</em> that starts from an average face shape and refines it in small steps. It is fast on an ordinary CPU and returns 2D image coordinates. Use the explorer below to see how the 68 points are grouped.</p>
+
+      <figure>
+        <div class="explorer">
+          <svg id="lm-svg" viewBox="0 0 300 330" role="img" aria-label="Schematic face with 68 numbered landmark points">
+            <ellipse cx="150" cy="180" rx="108" ry="146" fill="#F3F5F7"/>
+            <path d="M85 140 Q107 125 129 140 Q107 155 85 140 Z M171 140 Q193 125 215 140 Q193 155 171 140 Z" fill="#fff" stroke="#C6CFD8"/>
+            <circle cx="107" cy="140" r="6" fill="#3E7896"/><circle cx="193" cy="140" r="6" fill="#3E7896"/>
+          </svg>
+          <div>
+            <div class="controls" role="group" aria-label="Show landmark region">
+              <button type="button" data-group="all">All</button>
+              <button type="button" data-group="box">Face box</button>
+              <button type="button" data-group="jaw">Jaw</button>
+              <button type="button" data-group="brows">Eyebrows</button>
+              <button type="button" data-group="nose">Nose</button>
+              <button type="button" data-group="eyes">Eyes</button>
+              <button type="button" data-group="mouth">Mouth</button>
+            </div>
+            <div class="info" id="lm-info" aria-live="polite"></div>
+          </div>
+        </div>
+        <figcaption>Figure 2. Interactive explorer of the 68-point landmark layout. Choose a region to highlight its points. Schematic drawing created by the author; the numbering follows the standard 68-point convention.</figcaption>
+      </figure>
+
+      <p>One detail trips up many first implementations: the 68 points are usually numbered 1 to 68 in diagrams, but code stores them in a list that starts at 0. The right eye's points 37 to 42 are therefore indices 36 to 41 in Python.</p>
+
+      <h3>MediaPipe Face Mesh</h3>
+      <p>Google's MediaPipe Face Mesh goes much further: it estimates <strong>468 points</strong> covering the whole face surface, and each point has a depth value, so it recovers a rough 3D face shape from a single ordinary camera. Recent driver monitoring systems favor it because it is fast, stable from frame to frame, and gives head-pose information almost for free. Zambrano et al. built their eye, mouth, gaze, and head-pose measurements entirely from these 468 points <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+
+      <figure>
+        <img src="images/mediapipe-face-mesh.png" alt="A face with MediaPipe's dense mesh of 468 landmarks drawn in green" loading="lazy">
+        <figcaption>Figure 3. Face detection and the 468-point MediaPipe face mesh. Source: Zambrano et al., Sensors 2026, Figure 2 <a class="cite" href="bibliography.html#ref3">[3]</a>, published under a CC BY 4.0 license.</figcaption>
+      </figure>
+
+      <p>Because the mesh has so many points, each system picks a small subset for each measurement. For the right eye, Zambrano et al. use MediaPipe points <strong>33, 160, 158, 133, 153, and 144</strong> as p1 to p6 <a class="cite" href="bibliography.html#ref3">[3]</a>, which play the same roles as Dlib's points 37 to 42.</p>
+
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>Dlib 68-point</th><th>MediaPipe Face Mesh</th></tr></thead>
+        <tbody>
+          <tr><td>Number of points</td><td>68</td><td>468 (478 with iris points)</td></tr>
+          <tr><td>Coordinates</td><td>2D pixels</td><td>Normalized 3D (x, y, relative depth)</td></tr>
+          <tr><td>Face detector</td><td>Separate (usually HOG + SVM)</td><td>Built in (BlazeFace)</td></tr>
+          <tr><td>Head pose</td><td>Needs extra fitting (Section 5)</td><td>Easier, thanks to the depth values</td></tr>
+          <tr><td>Best for</td><td>Learning the concepts; CPU-only prototypes</td><td>Phones and modern real-time systems</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>In code: finding the eye landmarks</h3>
+      <p>This short Python program reads the webcam, runs MediaPipe Face Mesh on each frame, and draws the six right-eye landmarks used for EAR. Section 11 builds on it to compute EAR and raise an alert. It is written for the MediaPipe 0.10 Solutions API.</p>
+      <pre><code>import cv2
+import mediapipe as mp
+
+RIGHT_EYE = [33, 160, 158, 133, 153, 144]   # p1..p6, as used in [3]
+
+face_mesh = mp.solutions.face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True)
+cap = cv2.VideoCapture(0)                    # 0 = default webcam
+
+while cap.isOpened():
+    ok, frame = cap.read()
+    if not ok:
+        break
+    h, w = frame.shape[:2]
+    results = face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+    if results.multi_face_landmarks:
+        lm = results.multi_face_landmarks[0].landmark
+        for i in RIGHT_EYE:
+            x, y = int(lm[i].x * w), int(lm[i].y * h)   # normalized -> pixels
+            cv2.circle(frame, (x, y), 2, (0, 255, 0), -1)
+    cv2.imshow("Eye landmarks", frame)
+    if cv2.waitKey(1) &amp; 0xFF == 27:      # press Esc to quit
+        break
+cap.release()
+cv2.destroyAllWindows()</code></pre>
+      <p>Two things to notice. MediaPipe expects RGB images while OpenCV delivers BGR, hence the conversion. And MediaPipe returns coordinates between 0 and 1, so they are multiplied by the frame's width and height to get pixels.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Camera placement and angle affect every later measurement; near-infrared cameras solve most nighttime problems.</li>
+          <li>About 30 frames per second is needed to reliably catch blinks, which last only 100 to 400 ms.</li>
+          <li>Face detection finds a box; landmark detection finds precise, numbered points inside it.</li>
+          <li>Dlib's 68 points are ideal for learning; MediaPipe's 468 3D points power most recent systems.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
@@ -42,5 +153,6 @@
   </main>
 </div>
 <script src="js/site.js"></script>
+<script src="js/landmarks.js"></script>
 </body>
 </html>
