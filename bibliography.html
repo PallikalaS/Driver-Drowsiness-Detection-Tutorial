@@ -69,11 +69,11 @@
       <section class="ref" id="ref5">
         <h3>[5] Eye Aspect Ratio for Real-Time Drowsiness Detection to Improve Driver Safety</h3>
         <dl>
-          <dt>Authors</dt><dd>C. Dewi, R.-C. Chen, C.-W. Chang, S.-H. Wu, X. Jiang, H. Yu</dd>
-          <dt>Date</dt><dd>2022</dd>
-          <dt>Source</dt><dd>Electronics, vol. 11, article 3183. <a href="https://doi.org/10.3390/electronics11193183">doi:10.3390/electronics11193183</a> (open access)</dd>
-          <dt>Synopsis</dt><dd>Applies the Eye Aspect Ratio to real-time driver drowsiness detection and is cited by later systems as a reference for computing EAR from facial landmarks.<p class="todo">Add one or two sentences on its method and results after skimming the paper.</p></dd>
-          <dt>Reliability</dt><dd>Medium. Peer-reviewed, open-access journal article.</dd>
+          <dt>Authors</dt><dd>Christine Dewi, Rung-Ching Chen, Chun-Wei Chang, Shih-Hung Wu, Xiaoyi Jiang, Hui Yu</dd>
+          <dt>Date</dt><dd>October 2022</dd>
+          <dt>Source</dt><dd>Electronics, vol. 11, no. 19, article 3183. <a href="https://doi.org/10.3390/electronics11193183">doi:10.3390/electronics11193183</a> (open access)</dd>
+          <dt>Synopsis</dt><dd>Detects eye blinks in real time from dashboard-camera video using Dlib's 68 facial landmarks and the Eye Aspect Ratio. The authors tested four EAR thresholds (0.18, 0.20, 0.225, and 0.25) on their own recordings of a driver with small eyes and glasses, plus two public blink datasets. A threshold of 0.18 worked best everywhere, and accuracy fell as the threshold rose, so they recommend recalculating the threshold for each person's eye size instead of using the common default of 0.2. They report overall accuracy of 96 to 97%.</dd>
+          <dt>Reliability</dt><dd>Medium. Peer-reviewed, open-access journal article with detailed result tables. Their own dataset shows one driver, and because open-eye frames vastly outnumber closed-eye frames, the high overall accuracy hides much weaker precision and recall on the closed-eye frames in their own tables.</dd>
         </dl>
       </section>
 
@@ -102,22 +102,22 @@
       <section class="ref" id="ref8">
         <h3>[8] Real-Time Deep Learning-Based Drowsiness Detection: Leveraging Computer-Vision and Eye-Blink Analyses for Enhanced Road Safety</h3>
         <dl>
-          <dt>Authors</dt><dd>F. Safarov, F. Akhmedov, A. B. Abdusalomov, R. Nasimov, Y. I. Cho</dd>
-          <dt>Date</dt><dd>2023</dd>
+          <dt>Authors</dt><dd>Furkat Safarov, Farkhod Akhmedov, Akmalbek Bobomirzaevich Abdusalomov, Rashid Nasimov, Young Im Cho</dd>
+          <dt>Date</dt><dd>July 2023</dd>
           <dt>Source</dt><dd>Sensors, vol. 23, no. 14, article 6459. <a href="https://doi.org/10.3390/s23146459">doi:10.3390/s23146459</a> (open access)</dd>
-          <dt>Synopsis</dt><dd>A CNN-based framework that combines facial landmark tracking with deep learning to detect blinking and yawning in real time. Later work reports its eye-based fatigue detection accuracy as 95.8%.<p class="todo">Confirm the reported accuracy and add a sentence on the network design after skimming the paper.</p></dd>
-          <dt>Reliability</dt><dd>Medium-high. Peer-reviewed, open-access journal article, widely cited by later driver monitoring papers.</dd>
+          <dt>Synopsis</dt><dd>Builds a real-time drowsiness detector on MediaPipe Face Mesh that combines EAR-based blink detection with iris detection: when the iris disappears and the eyelid landmarks agree, the eye is counted as closed, which reduces false blinks when the driver simply looks down. It also detects yawning and the head falling to the left, right, or back, trained on the authors' own dataset. Reported results: 95.8% for detecting drowsy (closed) eyes, 97% for open eyes, about 85% for yawning, and 98 to 100% for detecting the head falling to the side.</dd>
+          <dt>Reliability</dt><dd>Medium. Peer-reviewed, open-access journal article from Gachon University (Korea) and Tashkent State University of Economics. The authors themselves note that sunglasses can block the eye landmarks, and that without more detail on sample size, validation method, and statistics, the reliability of their accuracy figures is hard to judge fully.</dd>
         </dl>
       </section>
 
       <section class="ref" id="ref9">
         <h3>[9] Real-Time Driver Drowsiness Detection Using Transformer Architectures: A Novel Deep Learning Approach</h3>
         <dl>
-          <dt>Authors</dt><dd>O. Hassan, A. Ibrahim, A. Gomaa</dd>
-          <dt>Date</dt><dd>2025</dd>
-          <dt>Source</dt><dd>Scientific Reports, vol. 15. <a href="https://doi.org/10.1038/s41598-025-02111-x">doi:10.1038/s41598-025-02111-x</a> (open access)</dd>
-          <dt>Synopsis</dt><dd>Applies transformer architectures, which model relationships across a whole image or sequence, to real-time driver drowsiness detection.<p class="todo">Add the architecture, dataset, and results after skimming the paper.</p></dd>
-          <dt>Reliability</dt><dd>High. Peer-reviewed article in Scientific Reports, a Nature Portfolio journal.</dd>
+          <dt>Authors</dt><dd>Osama F. Hassan, Ahmed F. Ibrahim, Ahmed Gomaa, M. A. Makhlouf, B. Hafiz</dd>
+          <dt>Date</dt><dd>May 2025</dd>
+          <dt>Source</dt><dd>Scientific Reports, vol. 15, article 17493. <a href="https://doi.org/10.1038/s41598-025-02111-x">doi:10.1038/s41598-025-02111-x</a> (open access)</dd>
+          <dt>Synopsis</dt><dd>Compares two vision transformers (ViT and Swin Transformer) against seven fine-tuned CNNs, including VGG19, DenseNet169, ResNet50V2, and MobileNet, for classifying cropped eye images as open or closed. Trained mainly on the MRL Eye Dataset (84,898 eye images), ViT reached 99.15% accuracy and Swin 99.03%, ahead of every CNN, with further tests on the NTHU-DDD and CEW datasets. In the real-time system, Haar cascades find the face and eyes, the classifier labels each eye, and an alarm sounds when a drowsiness score built from consecutive closed-eye frames passes 15. Class Activation Maps show the model focuses on the eye region.</dd>
+          <dt>Reliability</dt><dd>High for the venue: a peer-reviewed article in Scientific Reports, a Nature Portfolio journal. Two cautions: the datasets were split 80/20 at the image level, which can let near-identical images of the same person appear in both training and test sets (Section 8), and the authors note the transformers are heavier and slower than lightweight CNNs such as MobileNet.</dd>
         </dl>
       </section>
 

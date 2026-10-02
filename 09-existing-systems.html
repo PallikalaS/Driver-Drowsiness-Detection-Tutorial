@@ -29,7 +29,7 @@
           <li class="research"><span class="yr">2016</span><span class="dot"></span><span class="what"><strong>Eye Aspect Ratio</strong> introduced for real-time blink detection <a class="cite" href="bibliography.html#ref4">[4]</a>; the <strong>NTHU-DDD</strong> benchmark released <a class="cite" href="bibliography.html#ref11">[11]</a>.</span></li>
           <li class="research"><span class="yr">2019</span><span class="dot"></span><span class="what"><strong>UTA-RLDD</strong>: the first large dataset of real, not acted, drowsiness <a class="cite" href="bibliography.html#ref10">[10]</a>.</span></li>
           <li class="regulation"><span class="yr">2022</span><span class="dot"></span><span class="what"><strong>EU requires drowsiness warning</strong> in new vehicle types <a class="cite" href="bibliography.html#ref12">[12]</a>.</span></li>
-          <li class="research"><span class="yr">2023</span><span class="dot"></span><span class="what">Landmark + CNN system detects <strong>blinks and yawns</strong> in real time <a class="cite" href="bibliography.html#ref8">[8]</a>.</span></li>
+          <li class="research"><span class="yr">2023</span><span class="dot"></span><span class="what">Landmark + iris system detects <strong>blinks, yawns, and head falls</strong> in real time <a class="cite" href="bibliography.html#ref8">[8]</a>.</span></li>
           <li class="regulation"><span class="yr">2024</span><span class="dot"></span><span class="what"><strong>Drowsiness warning required in all new EU vehicles</strong>; distraction warning required in new types <a class="cite" href="bibliography.html#ref12">[12]</a>.</span></li>
           <li class="research"><span class="yr">2025</span><span class="dot"></span><span class="what"><strong>YOLOv5–v11</strong> compared against EAR <a class="cite" href="bibliography.html#ref6">[6]</a>; <strong>3D Eyelid Angle</strong> proposed <a class="cite" href="bibliography.html#ref7">[7]</a>.</span></li>
           <li class="research"><span class="yr">2026</span><span class="dot"></span><span class="what"><strong>MediaPipe-based monitor</strong> tested with 27 drivers <a class="cite" href="bibliography.html#ref3">[3]</a>.</span></li>
@@ -62,12 +62,12 @@
       </div>
 
       <div class="sys-card">
-        <h3>3. Landmark + CNN blink and yawn detector (Safarov et al., 2023)</h3>
-        <p class="meta">Hybrid: landmark tracking with deep learning <a class="cite" href="bibliography.html#ref8">[8]</a></p>
+        <h3>3. Landmarks + iris detection (Safarov et al., 2023)</h3>
+        <p class="meta">Hybrid landmark and deep learning system · Authors' own dataset <a class="cite" href="bibliography.html#ref8">[8]</a></p>
         <dl>
-          <dt>How it works</dt><dd>Facial landmark tracking combined with a CNN to detect blinking and yawning in real time <a class="cite" href="bibliography.html#ref8">[8]</a>.</dd>
-          <dt>Results</dt><dd>Reported at 95.8% accuracy for eye-based fatigue detection <a class="cite" href="bibliography.html#ref3">[3]</a>.</dd>
-          <dt>Where it failed</dt><dd class="todo">Add the limitations the authors report after skimming the paper.</dd>
+          <dt>How it works</dt><dd>MediaPipe Face Mesh landmarks give EAR and mouth measurements; iris detection confirms when an eye is really closed, reducing false blinks when the driver looks down. It also detects the head falling left, right, or back <a class="cite" href="bibliography.html#ref8">[8]</a>.</dd>
+          <dt>Results</dt><dd>95.8% for detecting drowsy eyes, 97% for open eyes, about 85% for yawning, and 98 to 100% for the head falling to the side <a class="cite" href="bibliography.html#ref8">[8]</a>.</dd>
+          <dt>Where it failed</dt><dd>The authors note that sunglasses can block the eye landmarks entirely, and they acknowledge that without more detail on sample size and validation, their accuracy figures are hard to assess <a class="cite" href="bibliography.html#ref8">[8]</a>.</dd>
         </dl>
       </div>
 
