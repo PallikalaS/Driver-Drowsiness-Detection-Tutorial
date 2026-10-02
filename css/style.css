@@ -232,3 +232,15 @@ figure img { border-radius: 10px; border: 1px solid var(--line); background: #ff
 .ear-lab .state { margin-top: .6rem; font-weight: 700; }
 .ear-lab .state.closed { color: #FFB4AE; }
 .plot { display: block; width: 100%; min-width: 560px; height: auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+
+/* ---------- head-pose lab (Section 5) ---------- */
+.head-lab { background: var(--night); color: #DCE4EC; border-radius: 14px; padding: 1.1rem 1.2rem 1.2rem; margin: 1.6rem 0; display: grid; grid-template-columns: minmax(0, 260px) 1fr; gap: 1.2rem; align-items: center; }
+.head-lab h3 { color: #fff; margin: 0 0 .5rem; grid-column: 1 / -1; }
+.head-lab svg { width: 100%; display: block; }
+.head-lab label { display: flex; justify-content: space-between; font-weight: 700; margin: .5rem 0 .15rem; }
+.head-lab label output { color: var(--amber); font-variant-numeric: tabular-nums; }
+.head-lab input[type=range] { width: 100%; accent-color: var(--amber); }
+.head-lab .verdict { margin-top: .8rem; background: var(--night-2); border-radius: 8px; padding: .6rem .8rem; min-height: 3.2em; }
+.head-lab .verdict.warn { color: #FFB4AE; }
+.head-lab button { margin-top: .6rem; font: inherit; font-size: .9rem; background: transparent; color: #DCE4EC; border: 1px solid #3A4859; border-radius: 999px; padding: .3rem .8rem; cursor: pointer; }
+@media (max-width: 700px) { .head-lab { grid-template-columns: 1fr; } }
