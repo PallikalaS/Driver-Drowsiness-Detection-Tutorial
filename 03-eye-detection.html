@@ -16,26 +16,157 @@
     <article class="content">
       <p class="page-num">Section 3 of 12</p>
       <h1>Eye-Based Drowsiness Detection</h1>
-      <p class="lead">The eyes are the strongest single signal of drowsiness. This page explains the two most widely used measurements.</p>
+      <p class="lead">The eyes are the strongest single signal of drowsiness. This page explains the two most widely used measurements: the Eye Aspect Ratio and PERCLOS.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/03-eye-detection.mp3">Your browser does not support audio playback.</audio>
       </div>
+
       <h2>Detecting open and closed eyes</h2>
-      <p class="todo">Explain the two ways to decide eye state in each frame: geometrically from landmarks (EAR, below) or with a CNN that classifies cropped eye images as open or closed (covered in Section 7).</p>
-      <figure>
-        <div class="fig-placeholder">Figure 4 goes here: EAR landmarks on an open eye and a closed eye, with an EAR-over-time plot showing blinks<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 4. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
-      </figure>
+      <p>Every eye-based method starts by deciding, frame by frame, whether each eye is open or closed. There are two ways to make that decision:</p>
+      <ul>
+        <li><strong>Geometric:</strong> use the eyelid landmarks from Section 2 and measure how far apart the lids are. This is fast, needs no training data, and is easy to explain. The Eye Aspect Ratio below is the standard example.</li>
+        <li><strong>Appearance-based:</strong> crop the eye region and let a trained classifier, usually a CNN, label it open or closed. This copes better with odd angles and glasses but needs labeled training data and more computing power. Section 7 covers it.</li>
+      </ul>
+      <p>Either way, a single frame says very little. A closed eye in one frame is usually just a blink. What signals drowsiness is how <em>long</em> and how <em>often</em> the eyes stay closed, so the per-frame decision is only the first step.</p>
+
       <h2>Eye Aspect Ratio (EAR)</h2>
-      <p class="todo">EAR was introduced by Soukupová and Čech <a class="cite" href="bibliography.html#ref4">[4]</a> and is still the standard landmark-based measure <a class="cite" href="bibliography.html#ref5">[5]</a>. Explain each landmark p1 to p6, walk through the formula below, and give typical values: open eyes around 0.25 to 0.30, with closure thresholds usually set between 0.15 and 0.25 <a class="cite" href="bibliography.html#ref6">[6]</a>. Link to the animated eye on the home page.</p>
+      <p>The Eye Aspect Ratio was introduced by Soukupová and Čech in 2016 as a simple way to detect blinks in real time from facial landmarks <a class="cite" href="bibliography.html#ref4">[4]</a>, and it remains the most widely used landmark-based eye measure in drowsiness detection today <a class="cite" href="bibliography.html#ref5">[5]</a>. It turns the six landmarks around an eye into a single number that is large when the eye is open and drops toward zero as it closes.</p>
       <div class="formula">EAR = ( ‖p2 − p6‖ + ‖p3 − p5‖ ) / ( 2 · ‖p1 − p4‖ )</div>
-      <p class="todo">Explain why the denominator is weighted by 2, why a ratio stays stable when the driver moves closer to or farther from the camera, and why it still changes when the head turns <a class="cite" href="bibliography.html#ref7">[7]</a>.</p>
+      <p>Here p1 and p4 are the two corners of the eye, p2 and p3 sit on the upper eyelid, and p6 and p5 sit directly below them on the lower eyelid. The double bars mean the straight-line (Euclidean) distance between two points. Reading the formula piece by piece:</p>
+      <ul>
+        <li>The <strong>numerator</strong> adds two vertical distances, measuring how far apart the eyelids are at two places along the eye.</li>
+        <li>The <strong>denominator</strong> is the eye's horizontal width. It is multiplied by 2 because the numerator adds two distances, so EAR is effectively the average lid opening divided by the eye width.</li>
+        <li>Because EAR is a <strong>ratio</strong>, it doesn't change when the driver leans toward or away from the camera. Moving closer makes every distance larger by the same factor, which cancels out.</li>
+      </ul>
+
+      <h3>A worked example</h3>
+      <p>Suppose the landmarks of an open eye, in pixels, are p1 = (0, 0) and p4 = (30, 0) for the corners, p2 = (10, −5) and p3 = (20, −5) on the upper lid, and p6 = (10, 4) and p5 = (20, 4) on the lower lid. Both vertical distances are 9 pixels and the width is 30, so EAR = (9 + 9) / (2 × 30) = <strong>0.30</strong>. If the lids close until they are 1 pixel apart, EAR = (1 + 1) / 60 ≈ <strong>0.03</strong>. Double every coordinate, as if the driver leaned in, and both answers stay exactly the same.</p>
+
+      <div class="ear-lab">
+        <h3>Try it: close the eye</h3>
+        <svg id="lab-eye" viewBox="0 0 240 120" role="img" aria-label="Eye with six landmarks whose lids follow the slider">
+          <defs><clipPath id="lab-clip"><path d="M20 60 Q120 -5 220 60 Q120 125 20 60 Z"/></clipPath></defs>
+          <g clip-path="url(#lab-clip)">
+            <rect width="240" height="120" fill="#EEF2F6"/>
+            <circle cx="120" cy="60" r="26" fill="#3E7896"/><circle cx="120" cy="60" r="11" fill="#0F1822"/>
+            <path id="lab-lid-up" fill="#33465B"/><path id="lab-lid-low" fill="#33465B"/>
+          </g>
+          <path d="M20 60 Q120 -5 220 60 Q120 125 20 60 Z" fill="none" stroke="#7F90A4" stroke-width="1.2"/>
+          <line x1="20" y1="60" x2="220" y2="60" stroke="#91A2B5" stroke-dasharray="3 3"/>
+          <line id="lab-v1" x1="85" x2="85" stroke="#E9A23B" stroke-dasharray="3 3"/>
+          <line id="lab-v2" x1="155" x2="155" stroke="#E9A23B" stroke-dasharray="3 3"/>
+          <g fill="#E9A23B" stroke="#16212F" stroke-width="1.2">
+            <circle id="q1" r="4.5"/><circle id="q2" r="4.5"/><circle id="q3" r="4.5"/>
+            <circle id="q4" r="4.5"/><circle id="q5" r="4.5"/><circle id="q6" r="4.5"/>
+          </g>
+          <g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="10" fill="#DCE4EC">
+            <text x="6" y="64">p1</text><text x="224" y="64">p4</text>
+          </g>
+        </svg>
+        <label for="lab-slider">Eye openness</label>
+        <input id="lab-slider" type="range" min="0" max="100" value="100">
+        <div class="calc" id="lab-calc" aria-live="polite"></div>
+        <div class="state" id="lab-state" aria-live="polite"></div>
+      </div>
+
+      <h3>Typical values and thresholds</h3>
+      <p>For an open eye, EAR usually sits around 0.25 to 0.30, and it falls close to zero when the eye shuts. Systems call an eye "closed" when EAR drops below a threshold, typically set somewhere between 0.15 and 0.25 depending on the camera setup and the drivers <a class="cite" href="bibliography.html#ref6">[6]</a>. To reduce noise, most systems average the left and right eyes into one value <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+      <p>Choosing the threshold is a real engineering decision. Zambrano et al. measured EAR in 27 fully alert drivers and found an average of 0.257 with a standard deviation of only 0.021, then used a fixed threshold of 0.23 <a class="cite" href="bibliography.html#ref3">[3]</a>. That worked for most people, but the same study found that drivers with naturally smaller eyes sat below 0.23 even when fully alert, and the system wrongly flagged them as drowsy <a class="cite" href="bibliography.html#ref3">[3]</a>. Setting the threshold relative to each driver's own open-eye baseline, measured during the first minute of driving, fixes most of these errors.</p>
+
       <h2>Detecting blinks and prolonged eye closure</h2>
-      <p class="todo">Explain the consecutive-frame rule: a blink drops EAR for about 100 to 400 ms, while drowsiness keeps it low much longer. Show how a frame threshold separates the two.</p>
+      <p>Once each frame has an EAR value, the system watches how long it stays below the threshold. A normal blink keeps EAR low for only a fraction of a second; a drowsy driver's eyes stay shut much longer. The usual rule counts <strong>consecutive</strong> frames below the threshold and raises an alert when the count passes a limit <a class="cite" href="bibliography.html#ref6">[6]</a>:</p>
+      <div class="formula">drowsy = 1 if N<sub>closed</sub> ≥ N<sub>limit</sub>, otherwise 0</div>
+      <p>The limit is a time converted to frames. At 30 frames per second, a limit of 15 frames means "eyes closed for at least half a second," well beyond a normal blink but short enough to warn before a full microsleep. Figure 4 shows the idea on an illustrative EAR signal.</p>
+
+      <figure>
+        <div class="table-wrap"><svg class="plot" viewBox="0 0 700 260" role="img" aria-labelledby="fig4-title">
+<title id="fig4-title">EAR over ten seconds: three short blinks dip below 0.20 for only 4 to 6 frames; a long closure of about 1.5 seconds stays below the threshold for 44 frames and triggers an alert.</title>
+<g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="12" fill="#566476">
+<rect x="462.8" y="18" width="90.4" height="198" fill="#FBE9E7"/>
+<line x1="52" x2="684" y1="216.0" y2="216.0" stroke="#E3E8ED"/>
+<text x="44" y="220.0" text-anchor="end">0.0</text>
+<line x1="52" x2="684" y1="159.4" y2="159.4" stroke="#E3E8ED"/>
+<text x="44" y="163.4" text-anchor="end">0.1</text>
+<line x1="52" x2="684" y1="102.9" y2="102.9" stroke="#E3E8ED"/>
+<text x="44" y="106.9" text-anchor="end">0.2</text>
+<line x1="52" x2="684" y1="46.3" y2="46.3" stroke="#E3E8ED"/>
+<text x="44" y="50.3" text-anchor="end">0.3</text>
+<text x="52.0" y="234" text-anchor="middle">0 s</text>
+<text x="178.4" y="234" text-anchor="middle">2 s</text>
+<text x="304.8" y="234" text-anchor="middle">4 s</text>
+<text x="431.2" y="234" text-anchor="middle">6 s</text>
+<text x="557.6" y="234" text-anchor="middle">8 s</text>
+<text x="684.0" y="234" text-anchor="middle">10 s</text>
+<text x="368.0" y="254" text-anchor="middle">Time</text>
+<text x="14" y="117.0" text-anchor="middle" transform="rotate(-90 14 117.0)">EAR</text>
+<line x1="52" x2="684" y1="102.9" y2="102.9" stroke="#C2413A" stroke-dasharray="6 4" stroke-width="1.5"/>
+<text x="405.9" y="96.9" text-anchor="middle" fill="#C2413A" font-weight="700">threshold 0.20</text>
+</g>
+<path d="M52.0 54.8 L54.1 52.8 L56.2 51.0 L58.3 49.8 L60.4 49.0 L62.5 49.0 L64.6 49.4 L66.7 50.3 L68.9 51.3 L71.0 52.3 L73.1 53.0 L75.2 53.4 L77.3 53.4 L79.4 53.0 L81.5 52.4 L83.6 51.9 L85.7 51.5 L87.8 51.6 L89.9 52.1 L92.0 53.2 L94.1 54.7 L96.2 56.5 L98.3 58.4 L100.5 60.0 L102.6 61.3 L104.7 61.9 L106.8 61.9 L108.9 61.3 L111.0 60.1 L113.1 58.6 L115.2 57.1 L117.3 55.7 L119.4 54.6 L121.5 54.0 L123.6 53.9 L125.7 54.1 L127.8 54.5 L129.9 54.9 L132.1 55.1 L134.2 54.9 L136.3 54.4 L138.4 53.4 L140.5 52.0 L142.6 63.6 L144.7 97.3 L146.8 141.7 L148.9 179.2 L151.0 179.2 L153.1 141.8 L155.2 97.8 L157.3 64.7 L159.4 53.7 L161.5 55.6 L163.7 57.1 L165.8 58.1 L167.9 58.6 L170.0 58.6 L172.1 58.2 L174.2 57.5 L176.3 56.9 L178.4 56.5 L180.5 56.4 L182.6 56.7 L184.7 57.3 L186.8 58.2 L188.9 59.1 L191.0 59.8 L193.1 60.1 L195.3 59.9 L197.4 59.1 L199.5 57.8 L201.6 56.0 L203.7 54.0 L205.8 52.0 L207.9 50.4 L210.0 49.2 L212.1 48.6 L214.2 48.6 L216.3 49.2 L218.4 50.1 L220.5 51.3 L222.6 52.4 L224.7 53.2 L226.9 53.7 L229.0 53.7 L231.1 53.4 L233.2 53.0 L235.3 52.5 L237.4 52.2 L239.5 52.2 L241.6 52.8 L243.7 53.9 L245.8 55.4 L247.9 57.1 L250.0 71.1 L252.1 104.6 L254.2 146.1 L256.3 180.1 L258.5 180.1 L260.6 146.0 L262.7 104.2 L264.8 70.5 L266.9 56.6 L269.0 55.1 L271.1 54.0 L273.2 53.4 L275.3 53.2 L277.4 53.4 L279.5 53.8 L281.6 54.3 L283.7 54.5 L285.8 54.4 L287.9 53.9 L290.1 53.0 L292.2 51.7 L294.3 50.4 L296.4 49.2 L298.5 48.3 L300.6 48.0 L302.7 48.2 L304.8 49.2 L306.9 50.6 L309.0 52.5 L311.1 54.4 L313.2 56.3 L315.3 57.8 L317.4 58.8 L319.5 59.2 L321.7 59.1 L323.8 58.6 L325.9 57.9 L328.0 57.2 L330.1 56.7 L332.2 56.5 L334.3 56.7 L336.4 57.2 L338.5 58.0 L340.6 58.8 L342.7 59.4 L344.8 59.6 L346.9 59.3 L349.0 58.5 L351.1 69.4 L353.3 101.2 L355.4 143.4 L357.5 179.4 L359.6 179.3 L361.7 141.8 L363.8 96.6 L365.9 61.5 L368.0 49.0 L370.1 50.1 L372.2 51.4 L374.3 52.6 L376.4 53.5 L378.5 54.1 L380.6 54.2 L382.7 54.0 L384.9 53.5 L387.0 53.1 L389.1 52.8 L391.2 52.9 L393.3 53.5 L395.4 54.5 L397.5 56.0 L399.6 57.7 L401.7 59.3 L403.8 60.8 L405.9 61.8 L408.0 62.1 L410.1 61.8 L412.2 60.9 L414.3 59.5 L416.5 57.8 L418.6 56.0 L420.7 54.5 L422.8 53.4 L424.9 52.7 L427.0 52.6 L429.1 52.8 L431.2 53.2 L433.3 53.7 L435.4 54.0 L437.5 54.0 L439.6 53.5 L441.7 52.7 L443.8 51.5 L445.9 50.3 L448.1 49.2 L450.2 48.5 L452.3 48.3 L454.4 48.7 L456.5 49.7 L458.6 75.4 L460.7 100.9 L462.8 125.7 L464.9 149.8 L467.0 173.3 L469.1 196.0 L471.2 194.0 L473.3 192.9 L475.4 193.2 L477.5 194.8 L479.7 197.0 L481.8 198.9 L483.9 199.6 L486.0 198.9 L488.1 197.0 L490.2 194.8 L492.3 193.2 L494.4 192.9 L496.5 194.0 L498.6 196.1 L500.7 198.2 L502.8 199.5 L504.9 199.3 L507.0 197.9 L509.1 195.7 L511.3 193.7 L513.4 192.8 L515.5 193.4 L517.6 195.1 L519.7 197.3 L521.8 199.1 L523.9 199.6 L526.0 198.6 L528.1 196.6 L530.2 194.5 L532.3 193.0 L534.4 193.0 L536.5 194.3 L538.6 196.4 L540.7 198.5 L542.9 199.5 L545.0 199.2 L547.1 172.7 L549.2 149.6 L551.3 127.2 L553.4 105.2 L555.5 83.5 L557.6 61.9 L559.7 62.1 L561.8 61.6 L563.9 60.5 L566.0 59.0 L568.1 57.2 L570.2 55.4 L572.3 53.9 L574.5 52.7 L576.6 52.1 L578.7 51.9 L580.8 52.2 L582.9 52.7 L585.0 53.2 L587.1 53.6 L589.2 53.6 L591.3 53.2 L593.4 52.5 L595.5 51.4 L597.6 50.3 L599.7 49.4 L601.8 48.8 L603.9 48.7 L606.1 49.2 L608.2 50.4 L610.3 52.0 L612.4 53.9 L614.5 56.0 L616.6 57.8 L618.7 59.2 L620.8 60.1 L622.9 60.3 L625.0 60.0 L627.1 59.3 L629.2 58.4 L631.3 57.4 L633.4 56.7 L635.5 56.3 L637.7 56.3 L639.8 56.7 L641.9 57.3 L644.0 57.9 L646.1 58.4 L648.2 58.4 L650.3 58.0 L652.4 57.0 L654.5 55.6 L656.6 53.8 L658.7 51.9 L660.8 50.1 L662.9 48.7 L665.0 47.9 L667.1 47.7 L669.3 48.1 L671.4 49.1 L673.5 50.5 L675.6 51.9 L677.7 53.3 L679.8 54.4 L681.9 55.1 L684.0 55.3" fill="none" stroke="#2F6F8F" stroke-width="2.2" stroke-linejoin="round"/>
+<g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="12.5" fill="#1B2530">
+<text x="254.2" y="207.5" text-anchor="middle">Normal blinks: only 4–6 frames below the line</text>
+<text x="507.0" y="34" text-anchor="middle" font-weight="700" fill="#C2413A">Long closure: about 1.5 s</text>
+<text x="507.0" y="50" text-anchor="middle" fill="#C2413A">44 frames → alert</text>
+</g></svg></div>
+        <figcaption>Figure 4. Illustrative EAR signal over 10 seconds at 30 frames per second. Normal blinks cross the threshold for only a few frames, while a long closure stays below it for 44 consecutive frames and triggers an alert. Synthetic data generated by the author.</figcaption>
+      </figure>
+
+      <p>In code, the rule is just a counter that resets whenever the eye reopens:</p>
+      <pre><code>EAR_THRESHOLD = 0.20
+CLOSED_FRAMES_LIMIT = 15        # 0.5 s at 30 fps
+closed_frames = 0
+
+def update(ear):
+    global closed_frames
+    if ear &lt; EAR_THRESHOLD:
+        closed_frames += 1
+        if closed_frames &gt;= CLOSED_FRAMES_LIMIT:
+            return "DROWSY"     # sound the alert
+    else:
+        closed_frames = 0       # eye reopened: just a blink
+    return "OK"</code></pre>
+
+      <h3>Where EAR falls short</h3>
+      <p>EAR's simplicity is also its weakness. Because it relies on a fixed threshold, it is sensitive to head pose, partial occlusion such as glasses, and changing light, and often needs recalibration for different drivers <a class="cite" href="bibliography.html#ref6">[6]</a>. Head rotation is a particular problem: EAR is measured in the flat 2D image, so turning the head changes the apparent eye width and shifts EAR even when the eyelids haven't moved. Researchers have recently proposed an <em>Eyelid Angle</em> computed from 3D landmarks, which stays much more stable when the viewing angle changes <a class="cite" href="bibliography.html#ref7">[7]</a>. Section 12 returns to this.</p>
+
       <h2>PERCLOS</h2>
-      <div class="formula">PERCLOS = (frames with eyes ≥ 80% closed) / (total frames in window) × 100%</div>
-      <p class="todo">Explain the P80 definition, typical window lengths (about 1 minute), and the alert thresholds used in the literature <a class="cite" href="bibliography.html#ref2">[2]</a>. Compare EAR (instant, per frame) with PERCLOS (summary over time).</p>
+      <p>EAR describes a single moment. <strong>PERCLOS</strong> (PERcentage of eyelid CLOSure) describes a stretch of time: the share of a time window during which the eyes are mostly closed. It is one of the most established eye-based drowsiness measures <a class="cite" href="bibliography.html#ref2">[2]</a>. The common version, called P80, counts the eyes as closed when the lids cover at least 80% of the eye:</p>
+      <div class="formula">PERCLOS = (frames with eyes ≥ 80% closed) / (total frames in the window) × 100%</div>
+      <p><strong>Example:</strong> over a 60-second window at 30 frames per second there are 1,800 frames. If 270 of them show the eyes at least 80% closed, PERCLOS = 270 / 1,800 = 15%. An alert driver blinking normally scores only a few percent, so a steady climb is a clear warning sign.</p>
+      <h3>Computing PERCLOS from EAR</h3>
+      <p>EAR and PERCLOS fit together neatly. If a driver's open-eye baseline is EAR<sub>open</sub>, then the eye is roughly 80% closed when EAR falls to 20% of that baseline. For a baseline of 0.28, that means EAR ≤ 0.056. Since EAR doesn't shrink perfectly in proportion to the lid gap, this is an approximation, but it ties both measures to the same landmarks. The window is usually kept as a sliding buffer of the most recent frames:</p>
+      <pre><code>from collections import deque
+
+WINDOW = 60 * 30                  # 60 seconds at 30 fps
+history = deque(maxlen=WINDOW)     # oldest frames drop off automatically
+
+def perclos(ear, ear_open=0.28):
+    history.append(ear &lt;= 0.2 * ear_open)    # True = at least 80% closed
+    return 100 * sum(history) / len(history)</code></pre>
+
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>EAR + consecutive frames</th><th>PERCLOS</th></tr></thead>
+        <tbody>
+          <tr><td>Time scale</td><td>Instant to about 1 second</td><td>Typically a 1-minute window</td></tr>
+          <tr><td>Detects</td><td>Long closures and microsleeps as they happen</td><td>Gradual build-up of drowsiness</td></tr>
+          <tr><td>Reaction speed</td><td>Fast</td><td>Slow, by design</td></tr>
+          <tr><td>Best use</td><td>Emergency "wake up" alerts</td><td>Early "take a break" warnings</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Many systems use both: PERCLOS to notice drowsiness building over minutes, and the consecutive-frame rule to react instantly if the eyes close for too long.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>EAR turns six eyelid landmarks into one number: about 0.25–0.30 when open, near zero when closed, unaffected by distance from the camera.</li>
+          <li>Drowsiness is about duration: count consecutive frames below the threshold to separate long closures from blinks.</li>
+          <li>Fixed thresholds fail for some drivers; calibrating to each driver's own baseline helps.</li>
+          <li>PERCLOS summarizes eye closure over a minute and catches drowsiness building up gradually.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
@@ -43,5 +174,6 @@
   </main>
 </div>
 <script src="js/site.js"></script>
+<script src="js/ear-lab.js"></script>
 </body>
 </html>

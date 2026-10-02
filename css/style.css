@@ -220,3 +220,15 @@ blockquote { margin: 1.5rem 0; padding: .8rem 1.2rem; border-left: 4px solid var
 .explorer .lbl { font: 600 7.5px var(--body); fill: #8A5A0E; pointer-events: none; }
 figure img { border-radius: 10px; border: 1px solid var(--line); background: #fff; display: block; }
 @media (max-width: 700px) { .explorer { grid-template-columns: 1fr; } }
+
+/* ---------- EAR lab (Section 3) ---------- */
+.ear-lab { background: var(--night); color: #DCE4EC; border-radius: 14px; padding: 1.1rem 1.2rem 1.2rem; margin: 1.6rem 0; }
+.ear-lab h3 { color: #fff; margin: 0 0 .6rem; }
+.ear-lab svg { width: 100%; max-width: 460px; display: block; margin: 0 auto; }
+.ear-lab label { display: block; font-weight: 700; margin: .8rem 0 .3rem; }
+.ear-lab input[type=range] { width: 100%; accent-color: var(--amber); }
+.ear-lab .calc { font-family: var(--mono); font-size: .98rem; background: var(--night-2); border-radius: 8px; padding: .7rem .9rem; margin-top: .8rem; line-height: 1.6; }
+.ear-lab .calc b { color: var(--amber); }
+.ear-lab .state { margin-top: .6rem; font-weight: 700; }
+.ear-lab .state.closed { color: #FFB4AE; }
+.plot { display: block; width: 100%; min-width: 560px; height: auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
