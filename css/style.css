@@ -181,3 +181,25 @@ blockquote { margin: 1.5rem 0; padding: .8rem 1.2rem; border-left: 4px solid var
   .ref dl { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ---------- section content helpers ---------- */
+.stages { list-style: none; padding: 0; margin: 1.4rem 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; counter-reset: stage; }
+.stages li {
+  counter-increment: stage; background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  padding: .75rem .8rem; font-size: .93rem; line-height: 1.4; position: relative;
+}
+.stages li::before { content: counter(stage); display: block; font-family: var(--head); font-weight: 700; color: var(--muted); font-size: 1rem; }
+.stages li strong { display: block; font-family: var(--head); font-size: 1.12rem; font-weight: 600; margin-bottom: .2rem; }
+.stages li.danger { border-color: var(--alert); background: #FDF1F0; }
+.stages li.danger::before { color: var(--alert); }
+.callout { background: var(--night); color: #DCE4EC; border-radius: 12px; padding: 1.1rem 1.3rem; margin: 1.6rem 0; }
+.callout strong { color: var(--amber); font-family: var(--head); font-size: 1.15rem; }
+.takeaways { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--info); border-radius: 0 12px 12px 0; padding: .9rem 1.3rem; margin-top: 2.5rem; }
+.takeaways h2 { margin-top: .3rem; font-size: 1.4rem; }
+.takeaways ul { padding-left: 1.2rem; margin: .4rem 0 .6rem; }
+.takeaways li { margin: .35rem 0; }
+.req li { margin: .4rem 0; }
+.pipeline { display: block; width: 100%; min-width: 600px; }
+.pipeline a rect { transition: fill .15s; }
+.pipeline a:hover rect, .pipeline a:focus rect { fill: #E9EEF3; }
+@media (max-width: 900px) { .stages { grid-template-columns: 1fr; } }

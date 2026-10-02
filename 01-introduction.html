@@ -21,16 +21,110 @@
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/01-introduction.mp3">Your browser does not support audio playback.</audio>
       </div>
+
       <h2>What is driver drowsiness?</h2>
-      <p class="todo">Define drowsiness and fatigue, and how they differ from distraction. Describe the progression from alert to drowsy to falling asleep.</p>
-      <figure>
-        <div class="fig-placeholder">Figure 1 goes here: Diagram of a driver-facing camera on the dashboard or steering column<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 1. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
-      </figure>
+      <p>Drowsiness is the state of being sleepy: the body is pulling toward sleep while the driver is trying to stay awake. It usually comes from too little sleep, from driving at a time when the body clock expects sleep (late at night or mid-afternoon), or from long, monotonous stretches of road.</p>
+      <p>Research papers often use <em>fatigue</em> for the same thing. Strictly speaking, fatigue is tiredness from doing a task for too long, while drowsiness is sleepiness. Behind the wheel both lead to the same result, so this tutorial treats them together.</p>
+      <p>Drowsiness is not the same as distraction. A distracted driver is awake but looking or thinking somewhere else. A drowsy driver may be looking straight at the road while slowly losing the ability to react to it. The two problems need different detection methods, and this tutorial focuses on drowsiness.</p>
+
+      <h3>From alert to asleep</h3>
+      <p>Drowsiness doesn't switch on all at once. It builds through stages, and each stage leaves visible traces on the face:</p>
+      <ol class="stages" aria-label="Stages of drowsiness">
+        <li><strong>Alert</strong>Normal blinking, steady head, quick reactions.</li>
+        <li><strong>Less alert</strong>Blinks get slower, attention starts to drift.</li>
+        <li><strong>Drowsy</strong>Heavy eyelids, frequent yawns, the head begins to nod.</li>
+        <li class="danger"><strong>Microsleep</strong>Eyes close for a few seconds, often without the driver noticing.</li>
+        <li class="danger"><strong>Asleep</strong>No one is in control of the car.</li>
+      </ol>
+      <p>Microsleeps are the stage that makes drowsiness so dangerous. A driver may not realize they're fatigued, and a microsleep at highway speed lasting 4 or 5 seconds is enough for the car to travel the length of a football field <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+      <div class="callout">
+        <strong>Do the math.</strong> At 65 mph a car covers about 29 meters every second. A 4-second microsleep means roughly 116 meters (about 380 feet) with nobody steering or braking.
+      </div>
+
       <h2>Why drowsiness detection matters</h2>
-      <p class="todo">Give crash statistics with citations, explain why drivers underestimate their own sleepiness, and name the groups most at risk (night-shift workers, truck drivers). The 2024 survey is a good starting source <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+      <p>Drowsy driving is hard to count. Police can test a driver for alcohol, but there is no roadside test for sleepiness, so crash reports depend on what drivers admit and what investigators can infer. That makes official numbers a floor, not a ceiling.</p>
+      <p>In 2023, police-reported drowsy-driving crashes killed 633 people in the United States, according to NHTSA data. A 2024 AAA Foundation for Traffic Safety study, however, estimated that a drowsy driver was involved in 17.6% of all fatal crashes from 2017 to 2021, about 30,000 deaths over five years and roughly ten times the reported figure <a class="cite" href="bibliography.html#ref1">[1]</a>. NHTSA also estimates that fatigue-related crashes cost society $109 billion a year, not counting property damage, and the CDC reports that about 1 in 25 adult drivers say they have fallen asleep while driving <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+      <p>The impairment is real, too: driving after more than 20 hours awake is comparable to driving with a blood-alcohol level of 0.08%, the U.S. legal limit <a class="cite" href="bibliography.html#ref1">[1]</a>. The deeper problem is that drivers are poor judges of their own sleepiness. By the time someone decides they're too tired to drive, they may already have had microsleeps they don't remember. That is the case for automatic monitoring: a system that watches for the physical signs of drowsiness doesn't rely on the driver's own judgment.</p>
+
       <h2>The role of computer vision in driver monitoring</h2>
-      <p class="todo">Compare the three families of detection methods: vehicle-based (steering, lane keeping), physiological (EEG, heart rate), and vision-based <a class="cite" href="bibliography.html#ref1">[1]</a>. Explain why camera-based methods are non-intrusive and practical, and define the problem this tutorial solves: given live video of a driver's face, decide whether they are drowsy and warn them.</p>
+      <p>Researchers have approached drowsiness detection from three directions <a class="cite" href="bibliography.html#ref2">[2]</a>:</p>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Approach</th><th>What it measures</th><th>Strengths</th><th>Weaknesses</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Vehicle-based</strong></td><td>Steering movements, lane position, speed changes</td><td>No sensors on the driver; cars already collect the data</td><td>Signs appear late, once the driver is already impaired; depends on road and driving style</td></tr>
+          <tr><td><strong>Physiological</strong></td><td>Brain activity (EEG), eye-muscle signals (EOG), heart rate</td><td>Can catch early changes before anything is visible</td><td>Needs sensors worn on the body, which is impractical for everyday driving</td></tr>
+          <tr><td><strong>Vision-based</strong></td><td>Eyes, mouth, and head movement from a camera</td><td>Contactless and cheap; catches early signs like long blinks</td><td>Affected by lighting, glasses, camera angle, and differences between faces</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Vision sits in the sweet spot. It reacts early enough to warn a driver before the car drifts out of its lane, and it is practical enough to run on a dashboard camera or a phone. Its weaknesses are mostly about image quality and differences between people, which Section 10 covers in detail.</p>
+      <p>The visual signs a camera looks for are the same ones sleep experts tell drivers to watch for in themselves: trouble keeping the eyes open, frequent yawning, and trouble keeping the head up <a class="cite" href="bibliography.html#ref1">[1]</a>. The rest of this tutorial turns each of those signs into a number a computer can measure.</p>
+
+      <h2>Problem definition</h2>
+      <p>Stated precisely, the problem is this: <strong>given a live video stream of a driver's face, decide at each moment whether the driver is alert or drowsy, and warn them as soon as drowsiness appears.</strong> A useful solution has to meet five requirements:</p>
+      <ul class="req">
+        <li><strong>Real time.</strong> At 30 frames per second, each frame must be processed in about 33 milliseconds.</li>
+        <li><strong>Early.</strong> The warning should come at the drowsy stage, before microsleeps begin.</li>
+        <li><strong>Few false alarms.</strong> Drivers switch off systems that beep for no reason.</li>
+        <li><strong>Robust.</strong> It must work at night, with glasses, from different camera angles, and for different faces.</li>
+        <li><strong>Affordable.</strong> It should run on a phone or a small in-car computer, not a server.</li>
+      </ul>
+      <p>Figure 1 shows the pipeline that most vision-based systems follow, and that this tutorial walks through step by step. Select any box to jump to the section that explains it.</p>
+
+      <figure>
+        <div class="table-wrap">
+        <svg class="pipeline" viewBox="0 0 760 190" role="img" aria-labelledby="fig1-title">
+          <title id="fig1-title">Pipeline: camera, face detection, facial landmarks, measurements (EAR, MAR, head pose), decision over time, alert</title>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="#566476"/>
+            </marker>
+          </defs>
+          <g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="15" fill="#1B2530" text-anchor="middle">
+            <a href="02-face-detection.html"><rect x="5" y="55" width="105" height="70" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+              <text x="57" y="86" font-weight="700">Camera</text><text x="57" y="104" fill="#566476" font-size="12.5">video frames</text></a>
+            <a href="02-face-detection.html"><rect x="130" y="55" width="105" height="70" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+              <text x="182" y="86" font-weight="700">Face</text><text x="182" y="104" fill="#566476" font-size="12.5">detection</text></a>
+            <a href="02-face-detection.html"><rect x="255" y="55" width="105" height="70" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+              <text x="307" y="86" font-weight="700">Facial</text><text x="307" y="104" fill="#566476" font-size="12.5">landmarks</text></a>
+            <a href="03-eye-detection.html"><rect x="380" y="8" width="120" height="48" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+              <text x="440" y="29" font-weight="700">Eyes</text><text x="440" y="46" fill="#566476" font-size="12.5">EAR, PERCLOS</text></a>
+            <a href="04-yawning.html"><rect x="380" y="66" width="120" height="48" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+              <text x="440" y="87" font-weight="700">Mouth</text><text x="440" y="104" fill="#566476" font-size="12.5">MAR, yawns</text></a>
+            <a href="05-head-pose.html"><rect x="380" y="124" width="120" height="48" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+              <text x="440" y="145" font-weight="700">Head</text><text x="440" y="162" fill="#566476" font-size="12.5">pose, nodding</text></a>
+            <a href="06-traditional-ml.html"><rect x="520" y="55" width="115" height="70" rx="10" fill="#fff" stroke="#D5DCE3" stroke-width="1.5"/>
+              <text x="577" y="86" font-weight="700">Decision</text><text x="577" y="104" fill="#566476" font-size="12.5">over time</text></a>
+            <rect x="655" y="55" width="100" height="70" rx="10" fill="#16212F"/>
+            <circle cx="705" cy="80" r="7" fill="#C2413A"/>
+            <text x="705" y="108" font-weight="700" fill="#fff">Alert</text>
+          </g>
+          <g stroke="#566476" stroke-width="1.6" fill="none" marker-end="url(#arrow)">
+            <line x1="110" y1="90" x2="128" y2="90"/>
+            <line x1="235" y1="90" x2="253" y2="90"/>
+            <path d="M360 90 H368 V32 H378"/>
+            <line x1="360" y1="90" x2="378" y2="90"/>
+            <path d="M360 90 H368 V148 H378"/>
+            <path d="M500 32 H510 V90 H518"/>
+            <line x1="500" y1="90" x2="518" y2="90"/>
+            <path d="M500 148 H510 V90 H518"/>
+            <line x1="635" y1="90" x2="653" y2="90"/>
+          </g>
+        </svg>
+        </div>
+        <figcaption>Figure 1. The vision-based drowsiness detection pipeline covered in this tutorial. Each box links to the section that explains it. Diagram created by the author.</figcaption>
+      </figure>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Drowsiness builds in stages, and microsleeps are the most dangerous because drivers often don't notice them.</li>
+          <li>Official crash counts understate the problem; one estimate puts drowsy drivers in about 1 in 6 fatal crashes.</li>
+          <li>Vision-based monitoring balances early warning with practicality, but it has to cope with lighting, glasses, and different faces.</li>
+          <li>The task: turn live video of a face into a timely, reliable alert, in real time and on modest hardware.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
