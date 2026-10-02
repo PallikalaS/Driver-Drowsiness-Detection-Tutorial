@@ -255,3 +255,17 @@ figure img { border-radius: 10px; border: 1px solid var(--line); background: #ff
 .knn-lab .result { margin-top: .7rem; font-weight: 700; min-height: 1.6em; }
 .knn-lab .legend { font-size: .9rem; color: var(--muted); }
 .knn-lab .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 .3rem 0 .6rem; vertical-align: middle; }
+
+/* ---------- convolution lab (Section 7) ---------- */
+.conv-lab { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.2rem 1.2rem; margin: 1.6rem 0; }
+.conv-lab h3 { margin: 0 0 .5rem; }
+.conv-lab .grids { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; }
+.conv-lab .grid { display: grid; gap: 2px; }
+.conv-lab .grid div { aspect-ratio: 1; border-radius: 2px; }
+.conv-lab .cap { font-size: .88rem; color: var(--muted); text-align: center; margin-top: .35rem; }
+.conv-lab .kernel { font-family: var(--mono); font-size: .85rem; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: .5rem .6rem; text-align: center; line-height: 1.5; }
+.conv-lab .row { display: flex; gap: .5rem; margin-top: .9rem; flex-wrap: wrap; align-items: center; }
+.conv-lab .row button { font: inherit; font-size: .92rem; padding: .3rem .8rem; border-radius: 999px; cursor: pointer; background: var(--paper); border: 1px solid var(--line); color: var(--ink); }
+.conv-lab .row button[aria-pressed="true"] { background: var(--night); border-color: var(--night); color: #fff; }
+.conv-lab .conv-msg { margin-top: .6rem; font-weight: 700; }
+@media (max-width: 640px) { .conv-lab .grids { grid-template-columns: 1fr; } }

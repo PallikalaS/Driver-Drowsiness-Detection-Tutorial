@@ -16,33 +16,156 @@
     <article class="content">
       <p class="page-num">Section 7 of 12</p>
       <h1>Deep Learning Approaches</h1>
-      <p class="lead">Neural networks learn eye and face patterns directly from images instead of relying on hand-made rules.</p>
+      <p class="lead">Neural networks learn eye and face patterns directly from images instead of relying on measurements and thresholds designed by people.</p>
       <div class="narration">
         <span>Listen to this page</span>
         <audio controls preload="none" src="audio/07-deep-learning.mp3">Your browser does not support audio playback.</audio>
       </div>
+
+      <p>Section 6 ended with a limitation: a traditional classifier can only learn from the features people design, and those features inherit every error in the landmarks. Deep learning removes that bottleneck. Given enough labeled images, a network discovers its own features, including subtle ones nobody thought to measure.</p>
+
       <h2>CNN-based drowsiness detection</h2>
-      <p class="todo">Explain an eye-state CNN classifier (open vs. closed eye crops) and whole-face detectors. Summarize the CNN blink and yawn system in <a class="cite" href="bibliography.html#ref8">[8]</a> and the YOLO comparison in <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
+      <h3>How a convolutional neural network sees</h3>
+      <p>A <strong>convolutional neural network (CNN)</strong> is built from layers of small filters, typically 3 × 3 pixels, that slide across the image. Each filter computes a weighted sum of the pixels under it, producing a <em>feature map</em> that lights up wherever the filter's pattern appears. The weights aren't designed by hand; the network learns them during training.</p>
+      <p>Stacked layers build up a hierarchy. The first layer learns simple edge detectors. The next combines edges into parts, such as the curve of an eyelid or the circle of an iris. Deeper layers respond to whole patterns, such as "an open eye." <strong>Pooling</strong> layers shrink the feature maps between steps, so later layers see a wider area and the network tolerates small shifts in position.</p>
+
+      <div class="conv-lab">
+        <h3>Try it: one filter, two eyes</h3>
+        <p>This is what a single first-layer filter does. The 3 × 3 kernel below detects horizontal edges, a pattern CNNs typically learn on their own. Orange cells respond to dark-above-light edges, blue to light-above-dark.</p>
+        <div class="grids">
+          <div><div class="grid" id="conv-in" aria-label="Grayscale eye image"></div><div class="cap">Input: 13 × 9 eye image</div></div>
+          <div><div class="kernel">−1 −2 −1<br>&nbsp;0 &nbsp;0 &nbsp;0<br>&nbsp;1 &nbsp;2 &nbsp;1</div><div class="cap">3 × 3 filter</div></div>
+          <div><div class="grid" id="conv-out" aria-label="Feature map produced by the filter"></div><div class="cap">Output: 11 × 7 feature map</div></div>
+        </div>
+        <div class="row" id="conv-toggle" role="group" aria-label="Eye state">
+          <button type="button" data-open="1">Open eye</button>
+          <button type="button" data-open="0">Closed eye</button>
+        </div>
+        <div class="conv-msg" id="conv-score" aria-live="polite"></div>
+      </div>
+      <p>A full network has dozens of such filters in every layer. Later layers combine their maps so that, for example, an "iris present" pattern only fires when curved edges surround a dark center, which happens for the open eye and not the closed one.</p>
+
+      <h3>Eye-state classification</h3>
+      <p>The most direct use of a CNN replaces the EAR threshold from Section 3. The landmarks are still used, but only to crop a small image around each eye; a CNN then decides whether the crop shows an open or a closed eye. Because the network judges the eye's appearance rather than six points, it is less thrown off by an awkward head angle or a slightly misplaced landmark. The open/closed decisions then feed the same consecutive-frame and PERCLOS logic as before.</p>
+
       <figure>
-        <div class="fig-placeholder">Figure 9 goes here: CNN architecture diagram for eye-state classification<br>Save the image in the images folder and replace this box with an &lt;img&gt; tag.</div>
-        <figcaption>Figure 9. Caption describing the image. Source: name the paper or website and link its citation number.</figcaption>
+        <div class="table-wrap"><svg class="pipeline" viewBox="0 0 760 210" role="img" aria-labelledby="fig9-title">
+  <title id="fig9-title">Eye-state CNN: a 64 by 64 grayscale eye crop passes through three convolution layers with pooling, global average pooling, and a final unit that outputs the probability the eye is closed.</title>
+  <defs><marker id="arr9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#566476"/></marker></defs>
+  <g font-family="Atkinson Hyperlegible, Verdana, sans-serif" font-size="12.5" fill="#1B2530" text-anchor="middle">
+    <rect x="10" y="55" width="80" height="80" fill="#EEF2F6" stroke="#91A2B5"/>
+    <path d="M18 95 Q50 70 82 95 Q50 120 18 95 Z" fill="#fff" stroke="#566476"/><circle cx="50" cy="95" r="11" fill="#3E7896"/><circle cx="50" cy="95" r="5" fill="#0F1822"/>
+    <text x="50" y="158" font-weight="700">Eye crop</text><text x="50" y="174" fill="#566476">64 × 64 × 1</text>
+    <g fill="#2F6F8F" fill-opacity=".18" stroke="#2F6F8F">
+      <rect x="140" y="50" width="62" height="62"/><rect x="146" y="56" width="62" height="62"/><rect x="152" y="62" width="62" height="62"/><rect x="158" y="68" width="62" height="62"/>
+    </g>
+    <text x="180" y="158" font-weight="700">Conv 16</text><text x="180" y="174" fill="#566476">+ pool → 31 × 31</text>
+    <g fill="#2F6F8F" fill-opacity=".22" stroke="#2F6F8F">
+      <rect x="262" y="62" width="42" height="42"/><rect x="267" y="67" width="42" height="42"/><rect x="272" y="72" width="42" height="42"/><rect x="277" y="77" width="42" height="42"/><rect x="282" y="82" width="42" height="42"/>
+    </g>
+    <text x="293" y="158" font-weight="700">Conv 32</text><text x="293" y="174" fill="#566476">+ pool → 14 × 14</text>
+    <g fill="#2F6F8F" fill-opacity=".28" stroke="#2F6F8F">
+      <rect x="370" y="74" width="26" height="26"/><rect x="374" y="78" width="26" height="26"/><rect x="378" y="82" width="26" height="26"/><rect x="382" y="86" width="26" height="26"/><rect x="386" y="90" width="26" height="26"/><rect x="390" y="94" width="26" height="26"/>
+    </g>
+    <text x="393" y="158" font-weight="700">Conv 64</text><text x="393" y="174" fill="#566476">12 × 12 × 64</text>
+    <g fill="#E9A23B" stroke="#8A5A0E">
+      <rect x="472" y="40" width="14" height="110" rx="3"/>
+    </g>
+    <text x="479" y="158" font-weight="700">Global avg. pool</text><text x="479" y="174" fill="#566476">64 values</text>
+    <circle cx="590" cy="95" r="22" fill="#fff" stroke="#16212F" stroke-width="1.5"/><text x="590" y="99" font-size="11">σ</text>
+    <text x="590" y="158" font-weight="700">Output</text><text x="590" y="174" fill="#566476">1 unit, sigmoid</text>
+    <rect x="650" y="68" width="100" height="54" rx="10" fill="#16212F"/><text x="700" y="91" fill="#fff" font-weight="700">P(closed)</text><text x="700" y="109" fill="#91A2B5">0 to 1</text>
+    <text x="300" y="25" fill="#566476">Layers learn edges → eyelid and iris parts → whole-eye patterns</text>
+  </g>
+  <g stroke="#566476" stroke-width="1.6" fill="none" marker-end="url(#arr9)">
+    <line x1="94" y1="95" x2="136" y2="95"/><line x1="226" y1="95" x2="258" y2="95"/><line x1="330" y1="95" x2="366" y2="95"/>
+    <line x1="420" y1="95" x2="468" y2="95"/><line x1="490" y1="95" x2="566" y2="95"/><line x1="614" y1="95" x2="646" y2="95"/>
+  </g>
+</svg>
+</div>
+        <figcaption>Figure 9. A small CNN for eye-state classification, matching the code below. Each convolution layer learns more filters on smaller feature maps, and the final unit outputs the probability that the eye is closed. Diagram created by the author.</figcaption>
       </figure>
-      <h2>Learning patterns over time</h2>
-      <p class="todo">Explain why temporal models (CNN + LSTM, transformers) help, since drowsiness unfolds over seconds rather than single frames. Summarize the transformer approach in <a class="cite" href="bibliography.html#ref9">[9]</a>.</p>
-      <h2>Traditional methods versus deep learning</h2>
-      <p class="todo">Fill in the comparison table below using the numbers in <a class="cite" href="bibliography.html#ref6">[6]</a>, and add a paragraph on when to choose each.</p>
+
+      <p>Here is that network in a few lines of Keras. It is small enough to train on a laptop and run in real time on a phone:</p>
+      <pre><code>from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    keras.Input(shape=(64, 64, 1)),             # grayscale eye crop
+    layers.Conv2D(16, 3, activation="relu"),     # 62x62x16: edges
+    layers.MaxPooling2D(),                       # 31x31
+    layers.Conv2D(32, 3, activation="relu"),     # 29x29x32: lid and iris parts
+    layers.MaxPooling2D(),                       # 14x14
+    layers.Conv2D(64, 3, activation="relu"),     # 12x12x64: whole-eye patterns
+    layers.GlobalAveragePooling2D(),             # one number per filter
+    layers.Dropout(0.3),                         # reduces overfitting
+    layers.Dense(1, activation="sigmoid"),       # probability the eye is closed
+])
+model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+model.fit(train_eyes, train_labels, validation_data=(val_eyes, val_labels), epochs=15)</code></pre>
+
+      <h3>Combining landmarks and CNNs</h3>
+      <p>Many recent systems mix both worlds. Safarov et al. built a real-time framework that combines facial landmark tracking with a CNN to detect blinking and yawning <a class="cite" href="bibliography.html#ref8">[8]</a>; a later study reports its eye-based fatigue detection at 95.8% accuracy <a class="cite" href="bibliography.html#ref3">[3]</a>. Zambrano et al. take a similar hybrid path: landmark-based EAR, MAR, and head pose for drowsiness, with a lightweight MobileNetV2 CNN running alongside in real time to recognize emotions <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+
+      <h3>Whole-face detectors: YOLO</h3>
+      <p>A different strategy skips landmarks entirely. An <strong>object detector</strong> such as YOLO ("You Only Look Once") looks at the whole frame once and outputs boxes with class labels. Trained with face boxes labeled "awake" or "drowsy," it learns every visible cue at once, including closed eyes, yawning, and a drooping head, rather than only the eye measurements <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
+      <p>Herath et al. compared seven YOLO versions on images from the UTA Real-Life Drowsiness Dataset, all trained the same way: 50 epochs at 640 × 640 pixels, starting from weights pre-trained on a general image dataset <a class="cite" href="bibliography.html#ref6">[6]</a>. Their results show the classic deep learning trade-off between accuracy and size:</p>
       <div class="table-wrap">
       <table>
-        <thead><tr><th>Aspect</th><th>Traditional (features + classifier)</th><th>Deep learning (CNN / CNN + LSTM)</th></tr></thead>
+        <thead><tr><th>Model</th><th>Precision</th><th>Recall</th><th>mAP@0.5</th><th>Training time per epoch</th></tr></thead>
         <tbody>
-          <tr><td>Training data needed</td><td>To fill in</td><td>To fill in</td></tr>
-          <tr><td>Speed on a phone</td><td>To fill in</td><td>To fill in</td></tr>
-          <tr><td>Robustness to lighting and glasses</td><td>To fill in</td><td>To fill in</td></tr>
-          <tr><td>Interpretability</td><td>To fill in</td><td>To fill in</td></tr>
-          <tr><td>Reported accuracy</td><td>To fill in</td><td>To fill in</td></tr>
+          <tr><td>EAR threshold rule (baseline)</td><td>0.812</td><td>0.82</td><td>n/a</td><td>No training</td></tr>
+          <tr><td>YOLOv5s</td><td>0.920</td><td>0.904</td><td>0.962</td><td>n/a</td></tr>
+          <tr><td>YOLOv11n (nano)</td><td>0.954</td><td>0.941</td><td>0.981</td><td>274 s</td></tr>
+          <tr><td>YOLOv9c (most accurate)</td><td>0.934</td><td>0.978</td><td>0.986</td><td>1,000 s</td></tr>
         </tbody>
       </table>
       </div>
+      <p>Source: Herath et al. <a class="cite" href="bibliography.html#ref6">[6]</a>. YOLOv9c caught the most drowsy cases, but its computing cost suggests it needs powerful hardware; the tiny YOLOv11n came close while training about four times faster per epoch, making it the authors' choice for embedded devices <a class="cite" href="bibliography.html#ref6">[6]</a>.</p>
+      <p><strong>Read these numbers with care.</strong> The study split individual frames randomly into training, validation, and test sets <a class="cite" href="bibliography.html#ref6">[6]</a>. Neighboring video frames of the same person look almost identical, so a random frame split can place near-copies of test images in the training set, which tends to make results look better than they would on a new driver. Section 8 covers this issue and how to avoid it.</p>
+
+      <h2>Learning patterns over time</h2>
+      <p>A CNN looking at a single frame faces the same problem as a single EAR value: it can't tell a blink from the start of a microsleep, because both look identical in one frame. Drowsiness unfolds over seconds, so the strongest deep learning systems look at <strong>sequences</strong>:</p>
+      <ul>
+        <li><strong>CNN + LSTM:</strong> a CNN turns each frame into a feature vector, and a <em>Long Short-Term Memory</em> network reads the sequence, remembering what happened a moment ago. It learns on its own that a closure lasting 40 frames means something different from one lasting 5.</li>
+        <li><strong>3D CNNs:</strong> filters that extend across time as well as space, so a single filter can respond to "eyelids closing slowly."</li>
+        <li><strong>Transformers:</strong> instead of reading frames strictly in order, <em>self-attention</em> lets the model directly compare any frame or image region with any other, which captures long-range patterns. Hassan et al. applied transformer architectures to real-time driver drowsiness detection <a class="cite" href="bibliography.html#ref9">[9]</a>.</li>
+      </ul>
+      <p class="todo">After skimming reference [9], add one or two sentences on its architecture and reported results here.</p>
+      <p>A CNN + LSTM needs only a few more lines than the eye classifier above: reuse the CNN (without its final layer) on every frame of a one-second clip, then let an LSTM read the results.</p>
+      <pre><code>backbone = keras.Model(model.input, model.layers[-3].output)   # CNN up to pooling
+
+clip = keras.Input(shape=(30, 64, 64, 1))           # 30 frames = 1 second
+x = layers.TimeDistributed(backbone)(clip)          # one feature vector per frame
+x = layers.LSTM(64)(x)                              # read the sequence
+drowsy = layers.Dense(1, activation="sigmoid")(x)   # probability of drowsiness
+sequence_model = keras.Model(clip, drowsy)</code></pre>
+
+      <h2>Traditional methods versus deep learning</h2>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspect</th><th>Traditional (landmarks + rules or classifiers)</th><th>Deep learning (CNN, YOLO, CNN + LSTM)</th></tr></thead>
+        <tbody>
+          <tr><td>Training data</td><td>None for rules; hundreds of labeled windows for classifiers</td><td>Thousands of labeled images or clips</td></tr>
+          <tr><td>Accuracy (one shared test)</td><td>EAR rule: 0.812 precision, 0.82 recall <a class="cite" href="bibliography.html#ref6">[6]</a></td><td>YOLO: 0.920–0.954 precision, 0.904–0.978 recall <a class="cite" href="bibliography.html#ref6">[6]</a></td></tr>
+          <tr><td>Hardware</td><td>Any CPU, including phones</td><td>GPU to train; small models run on phones</td></tr>
+          <tr><td>Robustness to head pose, glasses, lighting</td><td>Weak with fixed thresholds <a class="cite" href="bibliography.html#ref6">[6]</a></td><td>Better, if the training data includes these conditions</td></tr>
+          <tr><td>Explainability</td><td>High: "PERCLOS was 22%"</td><td>Low: hard to say why the network decided</td></tr>
+          <tr><td>Failure mode</td><td>Predictable: wrong threshold for a person</td><td>Less predictable: conditions unlike the training data</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>When to choose which.</strong> Choose a landmark-and-rules approach for a quick, explainable prototype on modest hardware, or when there's no labeled data. Choose deep learning when accuracy matters most and representative training data is available, and pick a small model (like a nano YOLO or a MobileNet) if it must run on a phone. In practice the best systems are often hybrids: landmarks for fast, interpretable measurements, plus a CNN to confirm eye state when the geometry is unreliable.</p>
+
+      <section class="takeaways">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>CNNs learn their own filters, from edges to whole-eye patterns, instead of relying on hand-designed measurements.</li>
+          <li>Eye-state CNNs replace the EAR threshold; whole-face detectors like YOLO learn eyes, yawns, and head pose at once.</li>
+          <li>In one comparison, YOLO models beat an EAR rule (precision up to 0.954 vs. 0.812), but random frame splits can inflate such results.</li>
+          <li>Drowsiness is temporal: CNN + LSTM and transformer models look at sequences, not single frames.</li>
+        </ul>
+      </section>
 
       <nav class="pager" aria-label="Page navigation"></nav>
       <footer class="site-footer"></footer>
@@ -50,5 +173,6 @@
   </main>
 </div>
 <script src="js/site.js"></script>
+<script src="js/conv-lab.js"></script>
 </body>
 </html>
