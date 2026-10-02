@@ -110,23 +110,32 @@
       </div>
 
       <h3>In code: finding the eye landmarks</h3>
-      <p>This short Python program reads the webcam, runs MediaPipe Face Mesh on each frame, and draws the six right-eye landmarks used for EAR. Section 11 builds on it to compute EAR and raise an alert. It is written for the MediaPipe 0.10 Solutions API.</p>
-      <pre><code>import cv2
+      <p>This short Python program reads the webcam, runs MediaPipe's face landmarker on each frame, and draws the six right-eye landmarks used for EAR. Section 11 builds on it to compute EAR and raise an alert. It uses MediaPipe's current <em>Tasks</em> API; first download the face model file, <a href="https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task">face_landmarker.task</a>, into the same folder.</p>
+      <pre><code>import time
+import cv2
 import mediapipe as mp
+from mediapipe.tasks import python as mp_tasks
+from mediapipe.tasks.python import vision
 
 RIGHT_EYE = [33, 160, 158, 133, 153, 144]   # p1..p6, as used in [3]
 
-face_mesh = mp.solutions.face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True)
+options = vision.FaceLandmarkerOptions(
+    base_options=mp_tasks.BaseOptions(model_asset_path="face_landmarker.task"),
+    running_mode=vision.RunningMode.VIDEO, num_faces=1)
+landmarker = vision.FaceLandmarker.create_from_options(options)
 cap = cv2.VideoCapture(0)                    # 0 = default webcam
+t0 = time.time()
 
 while cap.isOpened():
     ok, frame = cap.read()
     if not ok:
         break
     h, w = frame.shape[:2]
-    results = face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-    if results.multi_face_landmarks:
-        lm = results.multi_face_landmarks[0].landmark
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+    result = landmarker.detect_for_video(image, int((time.time() - t0) * 1000))
+    if result.face_landmarks:
+        lm = result.face_landmarks[0]
         for i in RIGHT_EYE:
             x, y = int(lm[i].x * w), int(lm[i].y * h)   # normalized -> pixels
             cv2.circle(frame, (x, y), 2, (0, 255, 0), -1)
@@ -135,7 +144,7 @@ while cap.isOpened():
         break
 cap.release()
 cv2.destroyAllWindows()</code></pre>
-      <p>Two things to notice. MediaPipe expects RGB images while OpenCV delivers BGR, hence the conversion. And MediaPipe returns coordinates between 0 and 1, so they are multiplied by the frame's width and height to get pixels.</p>
+      <p>Three things to notice. MediaPipe expects RGB images while OpenCV delivers BGR, hence the conversion. MediaPipe returns coordinates between 0 and 1, so they are multiplied by the frame's width and height to get pixels. And in video mode every frame needs a timestamp that always increases, which the program takes from the clock.</p>
 
       <section class="takeaways">
         <h2>Key takeaways</h2>

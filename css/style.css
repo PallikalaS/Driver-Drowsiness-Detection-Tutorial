@@ -321,3 +321,7 @@ figure img { border-radius: 10px; border: 1px solid var(--line); background: #ff
 .interview { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--amber); border-radius: 0 12px 12px 0; padding: .9rem 1.2rem; margin: 1.2rem 0; }
 .interview h3 { margin-top: .2rem; }
 .interview .q { font-weight: 700; margin: 1rem 0 .3rem; background: none; border: 0; padding: 0; }
+
+details { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: .7rem 1rem; margin: 1.2rem 0; }
+details summary { cursor: pointer; }
+details pre { margin-bottom: 0; }
