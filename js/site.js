@@ -63,6 +63,9 @@ const PAGES = [
       `Written by Swathi Pallikala.<br>Full references are in the <a href="bibliography.html">annotated bibliography</a>.`;
   }
 
+  // ----- narration players: custom controls that always run left to right -----
+  document.querySelectorAll(".narration audio").forEach(enhanceAudio);
+
   // ----- homepage eye demo -----
   const svg = document.getElementById("eye-demo");
   if (svg) runEyeDemo(svg);
@@ -148,4 +151,65 @@ function runEyeDemo(svg) {
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+}
+
+/* Replaces the browser's built-in audio controls with a simple player:
+   play/pause, a progress bar that fills left to right, and elapsed / total time. */
+function enhanceAudio(audio) {
+  const PLAY = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z"/></svg>';
+  const PAUSE = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5h3v11H3zM8 1.5h3v11H8z"/></svg>';
+  const fmt = t => (isFinite(t) && t >= 0) ? `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}` : "–:––";
+
+  audio.removeAttribute("controls");
+  audio.preload = "metadata";                       // load just enough to know the length
+  const wrap = document.createElement("div");
+  wrap.className = "player";
+  wrap.innerHTML =
+    `<button type="button" class="pp" aria-label="Play narration">${PLAY}</button>` +
+    `<div class="bar" role="slider" tabindex="0" aria-label="Narration position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill"></div></div>` +
+    `<span class="time">0:00 / –:––</span>`;
+  audio.after(wrap);
+  const btn = wrap.querySelector(".pp"), bar = wrap.querySelector(".bar"),
+        fill = wrap.querySelector(".fill"), time = wrap.querySelector(".time");
+
+  const known = () => isFinite(audio.duration) && audio.duration > 0;
+  function render() {
+    const d = audio.duration, t = audio.currentTime;
+    bar.classList.toggle("unknown", !known() && !audio.paused);
+    const pct = known() ? Math.min(100, (t / d) * 100) : 0;
+    fill.style.width = pct + "%";
+    bar.setAttribute("aria-valuenow", Math.round(pct));
+    time.textContent = known() ? `${fmt(t)} / ${fmt(d)}` : fmt(t);
+  }
+  function setIcon() {
+    btn.innerHTML = audio.paused ? PLAY : PAUSE;
+    btn.setAttribute("aria-label", audio.paused ? "Play narration" : "Pause narration");
+  }
+  btn.addEventListener("click", () => {
+    if (audio.paused) {
+      // pause any other narration that is playing
+      document.querySelectorAll(".narration audio").forEach(a => { if (a !== audio) a.pause(); });
+      audio.play().catch(() => {});
+    } else audio.pause();
+  });
+  function seekTo(fraction) {
+    if (known()) { audio.currentTime = Math.max(0, Math.min(1, fraction)) * audio.duration; render(); }
+  }
+  bar.addEventListener("click", e => {
+    const r = bar.getBoundingClientRect();
+    seekTo((e.clientX - r.left) / r.width);               // measured from the left edge
+  });
+  bar.addEventListener("keydown", e => {
+    if (!known()) return;
+    if (e.key === "ArrowRight") { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); e.preventDefault(); }
+    if (e.key === "ArrowLeft") { audio.currentTime = Math.max(0, audio.currentTime - 5); e.preventDefault(); }
+    render();
+  });
+  ["timeupdate", "durationchange", "loadedmetadata", "seeked"].forEach(ev => audio.addEventListener(ev, render));
+  ["play", "pause"].forEach(ev => audio.addEventListener(ev, () => { setIcon(); render(); }));
+  audio.addEventListener("ended", () => { audio.currentTime = 0; setIcon(); render(); });
+  audio.addEventListener("error", () => {
+    wrap.innerHTML = '<span class="player-msg">This recording can\'t be played in this browser yet.</span>';
+  });
+  render();
 }
